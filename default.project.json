@@ -21,6 +21,11 @@
     },
     "StarterGui": {
       "$path": "src/gui"
+    },
+    "Workspace": {
+      "Map": {
+        "$path": "map/Map.model.json"
+      }
     }
   }
 }

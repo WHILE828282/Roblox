@@ -2,8 +2,6 @@
 *.rbxl
 *.rbxlx
 *.rbxm
-# ...except the map, which must be committed
-!map/Map.rbxm
 *.rbxmx
 # Studio lock files
 *.rbxl.lock

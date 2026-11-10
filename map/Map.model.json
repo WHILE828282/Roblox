@@ -1,0 +1,5309 @@
+{
+ "className": "Folder",
+ "children": [
+  {
+   "name": "Hazards",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "LavaFloor",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       260,
+       1,
+       971.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         5,
+         -445.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.43137254901960786,
+       0.0784313725490196
+      ],
+      "Material": "CrackedLava",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Start",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Start",
+     "className": "SpawnLocation",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       14,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         29.5,
+         -6
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ],
+      "Duration": 0,
+      "Neutral": true
+     },
+     "attributes": {
+      "Stage": 0
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         5,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 1",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level01",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       7,
+       1,
+       7
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         29.5,
+         -21.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       7,
+       1,
+       7
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2,
+         29.5,
+         -33.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2,
+         33.0,
+         -33.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       7,
+       1,
+       7
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2,
+         29.5,
+         -45.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       7,
+       1,
+       7
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         29.5,
+         -57.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         33.0,
+         -57.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       7,
+       1,
+       7
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2,
+         29.5,
+         -69.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Checkpoint1",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         29.5,
+         -84.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 1
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 2",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level02",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         32.0,
+         -98.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         34.5,
+         -109.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         37.0,
+         -120.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         40.5,
+         -120.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         39.5,
+         -131.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         42.0,
+         -142.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         44.5,
+         -153.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         48.0,
+         -153.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Checkpoint2",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         44.5,
+         -167.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 2
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 3",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level03",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Beam",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         44.5,
+         -182.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         48.0,
+         -182.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Beam",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         44.5,
+         -198.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Beam",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         44.5,
+         -214.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         48.0,
+         -214.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Beam",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         44.5,
+         -230.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Beam",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       1,
+       14
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         44.5,
+         -246.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         48.0,
+         -246.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Checkpoint3",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         44.5,
+         -264.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 3
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 4",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level04",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Floor",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1,
+       70
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         44.5,
+         -309.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.5882352941176471,
+       0.19607843137254902
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -284.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -289.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -294.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -299.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -304.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -309.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -314.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -319.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -324.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -329.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "LavaStrip",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1.2,
+       1.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.6,
+         -334.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "KillPart"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         48.0,
+         -339.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Checkpoint4",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         44.5,
+         -355.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 4
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 5",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level05",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         44.5,
+         -368.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         45.5,
+         -378.25
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         44.5,
+         -387.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.5,
+         -397.25
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         49.0,
+         -397.25
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 2
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         4,
+         45.5,
+         -406.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2,
+         46.5,
+         -416.25
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Pillar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3.5,
+       1,
+       3.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.5,
+         -425.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         49.0,
+         -425.75
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 2
+     }
+    },
+    {
+     "name": "Checkpoint5",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -438.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 5
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 6",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level06",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "SpinnerFloor",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       26,
+       1,
+       26
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -462.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "SpinnerBar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       24,
+       1,
+       1
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         47.5,
+         -462.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Spinner",
+       "KillPart"
+      ],
+      "CanCollide": false
+     },
+     "attributes": {
+      "Speed": 70
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         8,
+         49.0,
+         -470.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "SpinnerFloor",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       26,
+       1,
+       26
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -493.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.34509803921568627,
+       0.5490196078431373,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "SpinnerBar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       24,
+       1,
+       1
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         47.5,
+         -493.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Spinner",
+       "KillPart"
+      ],
+      "CanCollide": false
+     },
+     "attributes": {
+      "Speed": -90
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         8,
+         49.0,
+         -501.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Checkpoint6",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -517.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 6
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 7",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level07",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.5,
+         -531.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         4,
+         45.5,
+         -542.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -4,
+         45.5,
+         -553.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         45.5,
+         -564.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         49.0,
+         -564.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 3
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         4,
+         45.5,
+         -575.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -4,
+         45.5,
+         -586.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.23529411764705882,
+       0.7843137254901961,
+       0.9019607843137255
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Checkpoint7",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -600.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 7
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 8",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level08",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Base",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         45.5,
+         -617.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Tower",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       16,
+       10
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         54.0,
+         -628.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.47058823529411764,
+       0.49019607843137253,
+       0.5490196078431373
+      ],
+      "Material": "Slate",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "ClimbTruss",
+     "className": "TrussPart",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       2,
+       16,
+       2
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         54.0,
+         -622.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.47058823529411764,
+       0.49019607843137253,
+       0.5490196078431373
+      ],
+      "Material": "DiamondPlate",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         65.0,
+         -628.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2,
+         58.5,
+         -641.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2,
+         55.5,
+         -652.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2,
+         52.5,
+         -663.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Platform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       6,
+       1,
+       6
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         49.5,
+         -674.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.6274509803921569,
+       0.39215686274509803,
+       1.0
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "Checkpoint8",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         49.5,
+         -688.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 8
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 9",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level09",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Bridge",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       3,
+       1,
+       66
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         49.5,
+         -731.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.5882352941176471,
+       0.19607843137254902
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "SpinnerBar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1,
+       1
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         51.5,
+         -713.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Spinner",
+       "KillPart"
+      ],
+      "CanCollide": false
+     },
+     "attributes": {
+      "Speed": 90
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         53.0,
+         -722.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 2
+     }
+    },
+    {
+     "name": "SpinnerBar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1,
+       1
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         51.5,
+         -731.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Spinner",
+       "KillPart"
+      ],
+      "CanCollide": false
+     },
+     "attributes": {
+      "Speed": -110
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         53.0,
+         -740.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 2
+     }
+    },
+    {
+     "name": "SpinnerBar",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       10,
+       1,
+       1
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         51.5,
+         -749.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9019607843137255,
+       0.19607843137254902,
+       0.19607843137254902
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Spinner",
+       "KillPart"
+      ],
+      "CanCollide": false
+     },
+     "attributes": {
+      "Speed": 130
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         53.0,
+         -758.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 2
+     }
+    },
+    {
+     "name": "Checkpoint9",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       12,
+       1,
+       12
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         49.5,
+         -775.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.3137254901960784,
+       0.803921568627451,
+       0.47058823529411764
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Checkpoint"
+      ]
+     },
+     "attributes": {
+      "Stage": 9
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         4,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "Level 10",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           0.3137254901960784,
+           0.803921568627451,
+           0.47058823529411764
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Level10",
+   "className": "Folder",
+   "children": [
+    {
+     "name": "Step",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         51.0,
+         -790.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         52.5,
+         -801.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9215686274509803,
+       0.9215686274509803,
+       0.9411764705882353
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Step",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         54.0,
+         -812.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         55.5,
+         -823.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9215686274509803,
+       0.9215686274509803,
+       0.9411764705882353
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Step",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         57.0,
+         -834.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         3,
+         58.5,
+         -845.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9215686274509803,
+       0.9215686274509803,
+       0.9411764705882353
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Step",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -3,
+         60.0,
+         -856.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.4117647058823529,
+       0.7058823529411765
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth"
+     }
+    },
+    {
+     "name": "FadingPlatform",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       5,
+       1,
+       5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         61.5,
+         -867.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       0.9215686274509803,
+       0.9215686274509803,
+       0.9411764705882353
+      ],
+      "Material": "SmoothPlastic",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "FadingPlatform"
+      ]
+     }
+    },
+    {
+     "name": "Coin",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       0.4,
+       2.5,
+       2.5
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0,
+         65.0,
+         -867.0
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Coin"
+      ],
+      "Shape": "Cylinder",
+      "CanCollide": false
+     },
+     "attributes": {
+      "Value": 5
+     }
+    },
+    {
+     "name": "Finish",
+     "className": "Part",
+     "properties": {
+      "Anchored": true,
+      "Size": [
+       16,
+       1,
+       16
+      ],
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         61.5,
+         -883.5
+        ],
+        "orientation": [
+         [
+          1,
+          0,
+          0
+         ],
+         [
+          0,
+          1,
+          0
+         ],
+         [
+          0,
+          0,
+          1
+         ]
+        ]
+       }
+      },
+      "Color": [
+       1.0,
+       0.7843137254901961,
+       0.1568627450980392
+      ],
+      "Material": "Neon",
+      "TopSurface": "Smooth",
+      "BottomSurface": "Smooth",
+      "Tags": [
+       "Finish"
+      ]
+     },
+     "children": [
+      {
+       "name": "Sign",
+       "className": "BillboardGui",
+       "properties": {
+        "Size": {
+         "UDim2": [
+          [
+           0,
+           220
+          ],
+          [
+           0,
+           60
+          ]
+         ]
+        },
+        "StudsOffset": [
+         0,
+         6,
+         0
+        ],
+        "MaxDistance": 150
+       },
+       "children": [
+        {
+         "name": "Text",
+         "className": "TextLabel",
+         "properties": {
+          "Size": {
+           "UDim2": [
+            [
+             1,
+             0
+            ],
+            [
+             1,
+             0
+            ]
+           ]
+          },
+          "BackgroundTransparency": 1,
+          "Text": "FINISH",
+          "TextScaled": true,
+          "Font": "GothamBold",
+          "TextColor3": [
+           1.0,
+           0.7843137254901961,
+           0.1568627450980392
+          ],
+          "TextStrokeTransparency": 0.3
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

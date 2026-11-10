@@ -18,12 +18,14 @@ local Leaderboard = require(Services.Leaderboard)
 local Checkpoints = require(Services.Checkpoints)
 local Coins = require(Services.Coins)
 local Hazards = require(Services.Hazards)
+local Obstacles = require(Services.Obstacles)
 local RateLimiter = require(script.Parent.Lib.RateLimiter)
 
 -- Map services first so checkpoints are known before players spawn.
 Checkpoints.start()
 Coins.start()
 Hazards.start()
+Obstacles.start()
 Leaderboard.start()
 PlayerData.start()
 

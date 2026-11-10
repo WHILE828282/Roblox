@@ -10,6 +10,8 @@ Config.Tags = {
 	Finish = "Finish", -- BasePart at the end of the last level
 	Coin = "Coin", -- BasePart that gives coins when touched
 	KillPart = "KillPart", -- BasePart that kills the player on touch (lava, spikes)
+	Spinner = "Spinner", -- BasePart that keeps rotating (optional attribute "Speed", degrees/second)
+	FadingPlatform = "FadingPlatform", -- BasePart that disappears shortly after a player steps on it
 }
 
 -- Name of the number attribute that every Checkpoint part must have.
@@ -46,6 +48,11 @@ Config.SyncCooldown = 1 -- seconds between "send me my state" requests
 -- Global leaderboard
 Config.LeaderboardSize = 10
 Config.LeaderboardRefreshInterval = 60 -- seconds
+
+-- Obstacles
+Config.SpinnerDefaultSpeed = 90 -- degrees per second when a Spinner has no "Speed" attribute
+Config.FadeDelay = 0.7 -- seconds a FadingPlatform stays solid after being touched
+Config.FadeRespawnTime = 3 -- seconds a FadingPlatform stays gone
 
 -- Seconds before the player is sent back to the start after finishing
 Config.FinishRespawnDelay = 4
