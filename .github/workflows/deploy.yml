@@ -1,0 +1,73 @@
+# Builds the place with Rojo and publishes it to Roblox on every push to main.
+# Required repository secrets (Settings > Secrets and variables > Actions):
+#   ROBLOX_API_KEY  Open Cloud API key with "universe-places: write" permission
+#   UNIVERSE_ID     the experience (universe) ID
+#   PLACE_ID        the place ID inside that experience
+name: Deploy to Roblox
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # also allows a manual run from the Actions tab
+
+# Never run two publishes at the same time.
+concurrency:
+  group: roblox-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rojo with Aftman (versions from aftman.toml)
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The map is built by hand in Studio and saved to map/Map.rbxm.
+      # Without it we would publish a place with scripts but no map,
+      # replacing your live game with an empty world, so stop instead.
+      - name: Check that the map file exists
+        run: |
+          if [ ! -f map/Map.rbxm ]; then
+            echo "::error::map/Map.rbxm not found. Save your map from Studio first (README, step 7)."
+            exit 1
+          fi
+
+      - name: Build game.rbxl (scripts + map)
+        run: rojo build deploy.project.json -o game.rbxl
+
+      - name: Publish with the Open Cloud Place Publishing API
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          UNIVERSE_ID: ${{ secrets.UNIVERSE_ID }}
+          PLACE_ID: ${{ secrets.PLACE_ID }}
+        run: |
+          set -euo pipefail
+          for name in ROBLOX_API_KEY UNIVERSE_ID PLACE_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set. See README, step 'GitHub secrets'."
+              exit 1
+            fi
+          done
+
+          status=$(curl --silent --show-error \
+            --output response.json --write-out "%{http_code}" \
+            --request POST \
+            "https://apis.roblox.com/universes/v1/${UNIVERSE_ID}/places/${PLACE_ID}/versions?versionType=Published" \
+            --header "x-api-key: ${ROBLOX_API_KEY}" \
+            --header "Content-Type: application/octet-stream" \
+            --data-binary @game.rbxl)
+
+          echo "Roblox responded with HTTP $status:"
+          cat response.json
+          echo
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Publishing failed (HTTP $status). Check the API key permissions, IP restrictions and the IDs."
+            exit 1
+          fi
+          echo "Published a new version of place $PLACE_ID."

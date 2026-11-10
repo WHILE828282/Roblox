@@ -1,0 +1,5 @@
+# Command-line tools used by this project, pinned to exact versions.
+# Install them with `rokit install` (Rokit) or `aftman install` (Aftman);
+# both tools read this file.
+[tools]
+rojo = "rojo-rbx/rojo@7.4.4"

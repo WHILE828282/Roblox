@@ -1,0 +1,15 @@
+# Build output (created by `rojo build`)
+*.rbxl
+*.rbxlx
+*.rbxm
+# ...except the map, which must be committed
+!map/Map.rbxm
+*.rbxmx
+# Studio lock files
+*.rbxl.lock
+*.rbxlx.lock
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+sourcemap.json
