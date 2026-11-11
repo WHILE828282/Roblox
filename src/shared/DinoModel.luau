@@ -5,6 +5,7 @@
 -- so `model:PivotTo(CFrame.new(position))` places it on the ground.
 
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(script.Parent.Config)
 local Dinos = require(script.Parent.Dinos)
@@ -184,11 +185,61 @@ local function buildQuad(model: Model, species, s: number): number
 	return bodyY + bodySize.Y / 2
 end
 
+---------------------------------------------------------------------------
+-- Ready-made models (ReplicatedStorage.DinoAssets)
+---------------------------------------------------------------------------
+-- DinoAssets holds one Model per species id ("Raptor", "TRex", ...) plus
+-- "Egg". Each model must look along -Z. If a model is missing, the blocky
+-- version above is used instead.
+
+local ADULT_HEIGHT = 5.5 -- studs for a species of size 1; bigger species scale up
+local ASSET_PARTS = { Mesh = true }
+
+local function findAsset(name: string): Model?
+	local folder = ReplicatedStorage:FindFirstChild("DinoAssets")
+	local asset = folder and folder:FindFirstChild(name)
+	return if asset and asset:IsA("Model") then asset else nil
+end
+
+-- Clones an asset, scales it to `height` studs and moves its parts into
+-- `model` so that they stand on the model's origin. Returns false if missing.
+local function addAsset(model: Model, name: string, height: number, centerY: boolean): boolean
+	local asset = findAsset(name)
+	if not asset then
+		return false
+	end
+	local clone = asset:Clone()
+	local size = clone:GetExtentsSize()
+	clone:ScaleTo(height / math.max(size.Y, 0.1))
+	local box, boxSize = clone:GetBoundingBox()
+	local bottom = box.Position - Vector3.new(0, if centerY then 0 else boxSize.Y / 2, 0)
+	for _, part in clone:GetDescendants() do
+		if part:IsA("BasePart") then
+			part.CFrame = part.CFrame - bottom
+			part.Anchored = true
+			part.CanCollide = false
+			part.CanTouch = false
+			part.CanQuery = false
+			part.Name = "Mesh"
+			part.Parent = model
+		end
+	end
+	clone:Destroy()
+	return true
+end
+
 local function applyTierLook(model: Model, root: BasePart, tierId: string, mutationId: string)
 	local tier = Dinos.TierById[tierId]
 	local glowing = tier and tier.index >= 6 -- Secret and Divine glow
 	for _, part in model:GetChildren() do
 		if part:IsA("BasePart") and part ~= root and part.Name ~= "Eye" and part.Name ~= "Teeth" then
+			if ASSET_PARTS[part.Name] and part:IsA("MeshPart") and (mutationId ~= "Normal" or glowing) then
+				part.TextureID = "" -- plain surface so gold / rainbow / glow colors show
+				if glowing and mutationId == "Normal" then
+					part.Material = Enum.Material.Neon
+					part.Color = tier.color
+				end
+			end
 			if mutationId == "Golden" then
 				part.Color = GOLD
 				part.Material = Enum.Material.Foil
@@ -231,7 +282,13 @@ function DinoModel.build(speciesId: string, tierId: string, mutationId: string?,
 	model.PrimaryPart = root
 
 	local s = species.size * stageInfo.scale
-	local backHeight = if species.kind == "quad" then buildQuad(model, species, s) else buildBiped(model, species, s)
+	local backHeight
+	local height = ADULT_HEIGHT * s
+	if addAsset(model, speciesId, height, false) then
+		backHeight = height * (if species.kind == "quad" then 0.72 else 0.6)
+	else
+		backHeight = if species.kind == "quad" then buildQuad(model, species, s) else buildBiped(model, species, s)
+	end
 	applyTierLook(model, root, tierId, mutationId)
 
 	model:SetAttribute("BackHeight", backHeight)
@@ -251,6 +308,41 @@ function DinoModel.buildEgg(speciesId: string, tierId: string, mutationId: strin
 	model.Name = "Egg"
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	local size = 2 + tier.index * 0.15
+	if addAsset(model, "Egg", size * 1.3, true) then
+		-- A mesh egg: the tier color tints the shell.
+		local shell = model:FindFirstChild("Mesh") :: BasePart
+		shell.Name = "Shell"
+		if tier.index > 1 and shell:IsA("MeshPart") then
+			-- Rare and better: a clean shell in the color of its rarity.
+			shell.TextureID = ""
+			shell.Color = tier.color
+			shell.Material = if tier.index >= 4 then Enum.Material.Neon else Enum.Material.SmoothPlastic
+		end
+		model.PrimaryPart = shell
+		if mutationId == "Golden" then
+			shell.Color = GOLD
+			shell.Material = Enum.Material.Foil
+		elseif mutationId == "Rainbow" then
+			if shell:IsA("MeshPart") then
+				shell.TextureID = ""
+			end
+			shell.Material = Enum.Material.Neon
+			CollectionService:AddTag(shell, Config.Tags.RainbowPart)
+		end
+		if tier.index >= 4 or mutationId ~= "Normal" then
+			local light = Instance.new("PointLight")
+			light.Color = tier.color
+			light.Range = 10 + tier.index * 2
+			light.Parent = shell
+			local sparkles = Instance.new("Sparkles")
+			sparkles.SparkleColor = tier.color
+			sparkles.Parent = shell
+		end
+		model:SetAttribute("Species", speciesId)
+		model:SetAttribute("Tier", tierId)
+		model:SetAttribute("Mutation", mutationId)
+		return model
+	end
 	local egg = makePart(model, "Shell", Vector3.new(size, size, size), Vector3.new(0, 0, 0), tier.color)
 	egg.Shape = Enum.PartType.Ball
 	local mesh = Instance.new("SpecialMesh")

@@ -12,6 +12,7 @@ local Economy = require(ReplicatedStorage.Shared.Economy)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Create = require(script.Parent.Create)
 local Theme = require(script.Parent.Theme)
+local Style = require(script.Parent.Style)
 
 local Panels = {}
 Panels.__index = Panels
@@ -81,6 +82,7 @@ local function smallButton(parent: Instance, props, onClick)
 		defaults[key] = value
 	end
 	local instance = Create("TextButton", defaults, { corner() })
+	Style.button(instance)
 	instance.Activated:Connect(onClick)
 	return instance
 end
@@ -114,6 +116,11 @@ function Panels.new(screenGui: ScreenGui, actions)
 		Parent = screenGui,
 	}, {
 		corner(),
+		Create("UIStroke", { Color = Color3.fromRGB(12, 14, 22), Thickness = 3 }),
+		Create("UIGradient", {
+			Rotation = 90,
+			Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.fromRGB(170, 175, 205)),
+		}),
 		Create("UISizeConstraint", { MaxSize = Vector2.new(440, 560) }),
 	})
 	self.title = text(self.frame, {
@@ -153,6 +160,7 @@ function Panels:open(name: string)
 	end
 	self.current = name
 	self.frame.Visible = true
+	Style.popIn(self.frame)
 	self.list.CanvasPosition = Vector2.zero
 	self:refresh()
 end

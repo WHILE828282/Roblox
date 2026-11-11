@@ -5,6 +5,9 @@
     "ReplicatedStorage": {
       "Shared": {
         "$path": "src/shared"
+      },
+      "DinoAssets": {
+        "$path": "assets/dinos/DinoAssets.model.json"
       }
     },
     "ServerScriptService": {

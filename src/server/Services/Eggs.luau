@@ -112,7 +112,8 @@ end
 local function spawnWildEgg(egg, to: Vector3, from: Vector3?)
 	local model = DinoModel.buildEgg(egg.s, egg.t, egg.m)
 	local tier = Dinos.TierById[egg.t]
-	local height = model.PrimaryPart.Size.Y * 1.3
+	local shell = model.PrimaryPart
+	local height = if shell:IsA("MeshPart") then shell.Size.Y else shell.Size.Y * 1.3
 	local landing = to + Vector3.new(0, height / 2, 0)
 
 	local gui = Instance.new("BillboardGui")

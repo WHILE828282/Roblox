@@ -11,6 +11,7 @@ local Dinos = require(ReplicatedStorage.Shared.Dinos)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Create = require(script.Parent.Create)
 local Theme = require(script.Parent.Theme)
+local Style = require(script.Parent.Style)
 
 local Hud = {}
 Hud.__index = Hud
@@ -55,6 +56,7 @@ local function button(props: { [string]: any }, onClick: () -> ()): TextButton
 		defaults[key] = value
 	end
 	local instance = Create("TextButton", defaults, { corner() })
+	Style.button(instance)
 	instance.Activated:Connect(onClick)
 	return instance
 end
@@ -87,14 +89,15 @@ function Hud.new(screenGui: ScreenGui, actions)
 		LayoutOrder = 1,
 		Parent = column,
 	}, {
+		Create("UIStroke", { Color = Color3.fromRGB(12, 14, 22), Thickness = 2.5 }),
 		corner(),
 		padding(10),
 		Create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }),
 	})
 	self.moneyLabel = label({
 		Text = "$0",
-		TextSize = 26,
-		Size = UDim2.new(1, 0, 0, 30),
+		TextSize = 32,
+		Size = UDim2.new(1, 0, 0, 36),
 		Font = Theme.BoldFont,
 		TextColor3 = Theme.Gold,
 		LayoutOrder = 1,
@@ -124,7 +127,7 @@ function Hud.new(screenGui: ScreenGui, actions)
 	-- Menu buttons (under the stats)
 	local menu = Create("Frame", {
 		Name = "Menu",
-		Size = UDim2.new(0, 120, 0, 0),
+		Size = UDim2.new(0, 150, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		LayoutOrder = 2,
@@ -133,7 +136,16 @@ function Hud.new(screenGui: ScreenGui, actions)
 		Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }),
 	})
 	for order, name in { "Dinos", "Upgrades", "Shop", "Odds" } do
-		button({ Name = name, Text = name, Size = UDim2.new(1, 0, 0, 38), LayoutOrder = order, Parent = menu }, function()
+		local colors = { Theme.Success, Theme.Accent, Theme.Gold, Color3.fromRGB(190, 110, 255) }
+		button({
+			Name = name,
+			Text = name,
+			TextSize = 19,
+			BackgroundColor3 = colors[order],
+			Size = UDim2.new(1, 0, 0, 44),
+			LayoutOrder = order,
+			Parent = menu,
+		}, function()
 			actions.openPanel(name)
 		end)
 	end
@@ -248,7 +260,15 @@ end
 
 function Hud:setState(state)
 	self.state = state
-	self.moneyLabel.Text = Format.money(state.money or 0)
+	-- The money label "punches" when you get a lump of money (a sale, a gift),
+	-- not on every normal income tick.
+	local money = state.money or 0
+	local gained = money - (self.lastMoney or money)
+	self.lastMoney = money
+	self.moneyLabel.Text = Format.money(money)
+	if gained > (state.income or 0) * 2 + 1 then
+		Style.punch(self.moneyLabel)
+	end
 	self.incomeLabel.Text = "+" .. Format.money(state.income or 0) .. "/s"
 	self.baseLabel.Text = string.format(
 		"Dinos %d/%d   Nests %d/%d",
@@ -335,6 +355,8 @@ function Hud:notify(message: string, kind: string?)
 	})
 	corner().Parent = toast
 	padding(6).Parent = toast
+	Style.text(toast, 1.4)
+	Style.popIn(toast)
 
 	local all = {}
 	for _, child in self.toasts:GetChildren() do
@@ -368,6 +390,7 @@ function Hud:announce(message: string, color: Color3?)
 	self.banner.Text = message
 	self.banner.TextColor3 = color or Theme.Gold
 	self.banner.Visible = true
+	Style.popIn(self.banner)
 	task.delay(5, function()
 		if self.bannerVersion == version then
 			self.banner.Visible = false
