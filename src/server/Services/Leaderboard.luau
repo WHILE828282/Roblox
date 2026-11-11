@@ -1,5 +1,5 @@
 -- Leaderboard.luau
--- Global "Top coins" leaderboard stored in an OrderedDataStore.
+-- Global "Top rescuers" leaderboard stored in an OrderedDataStore.
 -- Scores are submitted when player data is saved; the top list is
 -- refreshed periodically and sent to every client.
 
@@ -14,7 +14,7 @@ local Leaderboard = {}
 
 local leaderboardRemote = Remotes.get("LeaderboardChanged")
 
--- Latest top list: { { rank = 1, name = "Builderman", coins = 123 }, ... }
+-- Latest top list: { { rank = 1, name = "Builderman", value = 123 }, ... }
 local cachedEntries = {}
 local nameCache: { [number]: string } = {}
 
@@ -30,13 +30,13 @@ do
 	end
 end
 
--- Stores a player's coin total. Safe to call often; errors are only logged.
-function Leaderboard.submit(userId: number, coins: number)
+-- Stores a player's score (total animals rescued). Safe to call often; errors are only logged.
+function Leaderboard.submit(userId: number, value: number)
 	if not store then
 		return
 	end
 	local ok, err = pcall(function()
-		store:SetAsync(tostring(userId), math.max(0, math.floor(coins)))
+		store:SetAsync(tostring(userId), math.max(0, math.floor(value)))
 	end)
 	if not ok then
 		warn("[Leaderboard] Submit failed: " .. tostring(err))
@@ -77,7 +77,7 @@ function Leaderboard.refresh()
 			table.insert(entries, {
 				rank = rank,
 				name = getName(userId),
-				coins = entry.value,
+				value = entry.value,
 			})
 		end
 	end

@@ -11,20 +11,28 @@ local FOLDER_NAME = "Remotes"
 local Remotes = {}
 
 -- Server -> client
---   StateChanged(state)        full player state for the HUD
+--   StateChanged(state)        money, income, upgrades... for the HUD
+--   ShelterChanged(animals)    the player's rescued animals
 --   Notify(message, kind)      short toast message
---   RunFinished(result)        finish popup data
---   LeaderboardChanged(list)   global top players by coins
+--   Announce(message)          big banner for everyone (rare rescues, storms)
+--   StormChanged(active, endsIn)
+--   LeaderboardChanged(list)   global top rescuers
 -- Client -> server (always validated on the server!)
---   RequestSync()              "send me my current state"
---   RequestReset()             "restart the obby from the beginning"
+--   RequestSync()              "send me my state"
+--   BuyUpgrade(upgradeId)      buy the next level of an upgrade
+--   SellAnimal(animalId)       sell one animal from the shelter
+--   SetAutoRescue(enabled)     turn the auto rescue gamepass on/off
 Remotes.Names = {
 	StateChanged = "StateChanged",
+	ShelterChanged = "ShelterChanged",
 	Notify = "Notify",
-	RunFinished = "RunFinished",
+	Announce = "Announce",
+	StormChanged = "StormChanged",
 	LeaderboardChanged = "LeaderboardChanged",
 	RequestSync = "RequestSync",
-	RequestReset = "RequestReset",
+	BuyUpgrade = "BuyUpgrade",
+	SellAnimal = "SellAnimal",
+	SetAutoRescue = "SetAutoRescue",
 }
 
 local function getFolder(): Instance

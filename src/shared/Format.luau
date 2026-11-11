@@ -3,24 +3,44 @@
 
 local Format = {}
 
--- 83.456 -> "1:23.45"
-function Format.time(seconds: number?): string
-	if not seconds or seconds <= 0 then
-		return "--:--.--"
+local SUFFIXES = { "", "K", "M", "B", "T", "Qa", "Qi" }
+
+-- 1234 -> "1.2K", 15000000 -> "15M"
+function Format.short(value: number): string
+	value = math.floor(value)
+	local index = 1
+	local scaled = value
+	while math.abs(scaled) >= 1000 and index < #SUFFIXES do
+		scaled /= 1000
+		index += 1
 	end
-	local minutes = math.floor(seconds / 60)
-	local rest = seconds - minutes * 60
-	return string.format("%d:%05.2f", minutes, rest)
+	if index == 1 then
+		return tostring(value)
+	end
+	local text = if math.abs(scaled) >= 100 then string.format("%d", scaled) else string.format("%.1f", scaled)
+	text = text:gsub("%.0$", "")
+	return text .. SUFFIXES[index]
 end
 
--- 1234567 -> "1,234,567"
-function Format.number(value: number): string
-	local text = tostring(math.floor(value))
-	local result = text:reverse():gsub("(%d%d%d)", "%1,"):reverse()
-	if result:sub(1, 1) == "," then
-		result = result:sub(2)
+function Format.money(value: number): string
+	return "$" .. Format.short(value)
+end
+
+-- 0.0213 -> "2.13%", 0.0002 -> "0.02%"
+function Format.percent(chance: number): string
+	local value = chance * 100
+	if value >= 10 then
+		return string.format("%.1f%%", value)
+	elseif value >= 0.1 then
+		return string.format("%.2f%%", value)
 	end
-	return result
+	return string.format("%.3f%%", value)
+end
+
+-- 125 -> "2:05"
+function Format.duration(seconds: number): string
+	seconds = math.max(0, math.floor(seconds))
+	return string.format("%d:%02d", seconds // 60, seconds % 60)
 end
 
 return Format

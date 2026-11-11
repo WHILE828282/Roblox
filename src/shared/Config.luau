@@ -1,60 +1,89 @@
 -- Config.luau
 -- Shared settings used by both the server and the client.
--- Change gameplay numbers here instead of editing the scripts.
+-- Gameplay numbers for animals and zones live in Animals.luau,
+-- prices and formulas in Economy.luau.
 
 local Config = {}
 
--- CollectionService tags. Put these tags on parts in Studio (see README).
+-- CollectionService tags used by the map (see README).
 Config.Tags = {
-	Checkpoint = "Checkpoint", -- BasePart with a whole-number attribute "Stage" (0 = start)
-	Finish = "Finish", -- BasePart at the end of the last level
-	Coin = "Coin", -- BasePart that gives coins when touched
-	KillPart = "KillPart", -- BasePart that kills the player on touch (lava, spikes)
-	Spinner = "Spinner", -- BasePart that keeps rotating (optional attribute "Speed", degrees/second)
-	FadingPlatform = "FadingPlatform", -- BasePart that disappears shortly after a player steps on it
+	ZoneArea = "ZoneArea", -- ground part of a zone (attribute "Zone")
+	RescueSpot = "RescueSpot", -- invisible part where an animal in trouble can appear (attribute "Zone")
+	ZoneGate = "ZoneGate", -- wall that blocks a locked zone (attribute "Zone" = zone it unlocks)
+	ShelterPlot = "ShelterPlot", -- a player's shelter (attribute "PlotIndex")
+	-- Added at runtime by the server, used by client effects:
+	RainbowPart = "RainbowPart",
 }
 
--- Name of the number attribute that every Checkpoint part must have.
-Config.StageAttribute = "Stage"
--- Optional number attribute on Coin parts that overrides CoinValue.
-Config.CoinValueAttribute = "Value"
+-- DataStore settings. Change the "_v1" suffix to start everyone from scratch.
+Config.DataStoreName = "AnimalRescueData_v1"
+Config.LeaderboardStoreName = "AnimalRescueTopRescuers_v1"
+Config.DataStoreRetries = 3
+Config.AutosaveInterval = 120
 
--- DataStore settings. Bump the "_v1" suffix to start everyone from scratch.
-Config.DataStoreName = "ObbyPlayerData_v1"
-Config.LeaderboardStoreName = "ObbyCoinsLeaderboard_v1"
-Config.DataStoreRetries = 3 -- attempts for every load/save call
-Config.AutosaveInterval = 120 -- seconds between automatic saves
-
--- What a brand new player starts with. Every key here is saved.
+-- What a brand new player starts with.
 Config.DefaultData = {
-	Coins = 0,
-	Stage = 0, -- highest checkpoint reached in the current run
-	BestTime = 0, -- best completion time in seconds (0 = no record yet)
-	Wins = 0, -- how many times the player finished the obby
+	Money = 0,
+	TotalRescued = 0,
+	NextId = 1, -- id for the next rescued animal
+	Animals = {}, -- { { id = number, s = speciesId, m = mutationId }, ... }
+	Zones = { "Forest" }, -- unlocked zones
+	Upgrades = { Speed = 0, Shelter = 0, Luck = 0 },
+	LuckBoostUntil = 0, -- os.time() when the paid personal luck boost ends
+	LastSeen = 0, -- os.time() of the last save (for offline income)
+	Purchases = {}, -- recent Robux purchase ids (prevents double rewards)
 }
 
--- Rewards
-Config.FinishReward = 50 -- coins for finishing the obby
-Config.CoinValue = 1 -- default coins per Coin part
-Config.CoinRespawnTime = 10 -- seconds before a collected coin comes back
+-- Rescue spawning
+Config.AnimalsPerZone = 8 -- animals in trouble waiting in every zone
+Config.SpawnInterval = 2 -- seconds between spawn checks
+Config.AnimalLifetime = 180 -- seconds before an unrescued animal is replaced
+Config.RescueDistance = 14 -- max studs between player and animal (anti-exploit)
+Config.HoldTolerance = 0.3 -- seconds of network slack allowed on hold timing
 
--- Anti-exploit limits (checked on the server)
-Config.MaxTouchDistance = 12 -- studs between the player and a touched part
-Config.MinSecondsPerStage = 1 -- a new checkpoint cannot be reached faster than this
-Config.MinRunTime = 20 -- full runs faster than this are rejected as cheating
-Config.ResetCooldown = 5 -- seconds between "restart" requests
-Config.SyncCooldown = 1 -- seconds between "send me my state" requests
+-- Auto rescue (gamepass)
+Config.AutoRescueRange = 22 -- studs around the player
+Config.AutoRescueSlowdown = 1.5 -- auto rescue takes this much longer than by hand
+
+-- Storm event
+Config.StormInterval = 600 -- seconds between storms
+Config.StormWarning = 10 -- seconds of warning before a storm
+Config.StormDuration = 60 -- seconds a storm lasts
+Config.StormAnimals = 20 -- extra animals that appear during a storm
+Config.StormLuck = 2 -- rarer animals are this much more likely in a storm
+
+-- Offline income
+Config.OfflineIncomeShare = 0.25 -- part of normal income earned while offline
+Config.OfflineIncomeMaxHours = 8
+
+-- Remote request cooldowns (seconds)
+Config.ActionCooldown = 0.25
+Config.SyncCooldown = 1
 
 -- Global leaderboard
 Config.LeaderboardSize = 10
-Config.LeaderboardRefreshInterval = 60 -- seconds
+Config.LeaderboardRefreshInterval = 60
 
--- Obstacles
-Config.SpinnerDefaultSpeed = 90 -- degrees per second when a Spinner has no "Speed" attribute
-Config.FadeDelay = 0.7 -- seconds a FadingPlatform stays solid after being touched
-Config.FadeRespawnTime = 3 -- seconds a FadingPlatform stays gone
-
--- Seconds before the player is sent back to the start after finishing
-Config.FinishRespawnDelay = 4
+-- Robux items. Create them on create.roblox.com (README, "Monetization")
+-- and paste the ids here. Items with id 0 show as "Coming soon".
+Config.GamePasses = {
+	DoubleMoney = 0, -- x2 money from all animals
+	AutoRescue = 0, -- rescues nearby animals automatically
+	FastHands = 0, -- rescue twice as fast
+	BigShelter = 0, -- +10 shelter slots
+}
+Config.Products = {
+	LuckBoost = 0, -- x2 personal luck for 15 minutes
+	ServerLuck = 0, -- rarer animals for the whole server for 10 minutes
+	SummonStorm = 0, -- start a storm right away
+	CashSmall = 0, -- 10 minutes of income
+	CashMedium = 0, -- 1 hour of income
+	CashLarge = 0, -- 6 hours of income
+}
+Config.LuckBoostDuration = 15 * 60
+Config.ServerLuckDuration = 10 * 60
+Config.ServerLuckMultiplier = 2
+Config.CashMinutes = { CashSmall = 10, CashMedium = 60, CashLarge = 360 }
+Config.CashMinimum = { CashSmall = 500, CashMedium = 3000, CashLarge = 20000 }
 
 return Config
