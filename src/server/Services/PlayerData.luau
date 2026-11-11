@@ -9,7 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
-local Animals = require(ReplicatedStorage.Shared.Animals)
+local Dinos = require(ReplicatedStorage.Shared.Dinos)
 local Economy = require(ReplicatedStorage.Shared.Economy)
 local Leaderboard = require(script.Parent.Leaderboard)
 
@@ -58,7 +58,15 @@ local function withRetries(label: string, fn: () -> any): (boolean, any)
 			return true, result
 		end
 		lastError = result
-		warn(string.format("[PlayerData] %s failed (attempt %d/%d): %s", label, attempt, Config.DataStoreRetries, tostring(result)))
+		warn(
+			string.format(
+				"[PlayerData] %s failed (attempt %d/%d): %s",
+				label,
+				attempt,
+				Config.DataStoreRetries,
+				tostring(result)
+			)
+		)
 		if attempt < Config.DataStoreRetries then
 			task.wait(2 ^ attempt)
 		end
@@ -77,35 +85,42 @@ local function number(value: any, default: number, min: number, max: number?): n
 	return value
 end
 
+local function validDino(entry): boolean
+	return type(entry) == "table"
+		and type(entry.id) == "number"
+		and Dinos.Species[entry.s] ~= nil
+		and Dinos.TierById[entry.t] ~= nil
+		and Dinos.Mutations[entry.m] ~= nil
+end
+
 -- Turns whatever was saved (old, broken or tampered) into valid data.
 local function reconcile(saved: any)
 	saved = if type(saved) == "table" then saved else {}
 	local data = {}
-	data.Money = math.floor(number(saved.Money, 0, 0))
-	data.TotalRescued = math.floor(number(saved.TotalRescued, 0, 0))
+	data.Money = number(saved.Money, 0, 0)
+	data.Hatched = math.floor(number(saved.Hatched, 0, 0))
 	data.NextId = math.floor(number(saved.NextId, 1, 1))
-	data.LuckBoostUntil = number(saved.LuckBoostUntil, 0, 0)
 	data.LastSeen = number(saved.LastSeen, 0, 0)
 
-	data.Animals = {}
-	if type(saved.Animals) == "table" then
-		for _, animal in saved.Animals do
-			if type(animal) == "table" and Animals.Species[animal.s] and Animals.Mutations[animal.m] and type(animal.id) == "number" then
-				local zone = if type(animal.z) == "string" and Animals.ZoneById[animal.z] then animal.z else nil
-				table.insert(data.Animals, { id = animal.id, s = animal.s, m = animal.m, z = zone })
-				data.NextId = math.max(data.NextId, animal.id + 1)
-			end
-			if #data.Animals >= 200 then
-				break
+	data.Dinos = {}
+	if type(saved.Dinos) == "table" then
+		for _, dino in saved.Dinos do
+			if validDino(dino) and #data.Dinos < 100 then
+				table.insert(data.Dinos, { id = dino.id, s = dino.s, t = dino.t, m = dino.m, g = number(dino.g, 0, 0) })
+				data.NextId = math.max(data.NextId, dino.id + 1)
 			end
 		end
 	end
 
-	data.Zones = { "Forest" }
-	if type(saved.Zones) == "table" then
-		for _, zoneId in saved.Zones do
-			if Animals.ZoneById[zoneId] and not table.find(data.Zones, zoneId) then
-				table.insert(data.Zones, zoneId)
+	data.Eggs = {}
+	if type(saved.Eggs) == "table" then
+		for _, egg in saved.Eggs do
+			if validDino(egg) and #data.Eggs < 20 then
+				table.insert(
+					data.Eggs,
+					{ id = egg.id, s = egg.s, t = egg.t, m = egg.m, hatchAt = number(egg.hatchAt, 0, 0) }
+				)
+				data.NextId = math.max(data.NextId, egg.id + 1)
 			end
 		end
 	end
@@ -119,7 +134,7 @@ local function reconcile(saved: any)
 	data.Purchases = {}
 	if type(saved.Purchases) == "table" then
 		for _, purchaseId in saved.Purchases do
-			if type(purchaseId) == "string" then
+			if type(purchaseId) == "string" and #data.Purchases < 50 then
 				table.insert(data.Purchases, purchaseId)
 			end
 		end
@@ -136,10 +151,10 @@ local function createLeaderstats(player: Player, data)
 	money.Value = data.Money
 	money.Parent = folder
 
-	local rescued = Instance.new("IntValue")
-	rescued.Name = "Rescued"
-	rescued.Value = data.TotalRescued
-	rescued.Parent = folder
+	local hatched = Instance.new("IntValue")
+	hatched.Name = "Hatched"
+	hatched.Value = data.Hatched
+	hatched.Parent = folder
 
 	folder.Parent = player
 end
@@ -168,11 +183,6 @@ function PlayerData.all()
 	return list
 end
 
-function PlayerData.hasZone(player: Player, zoneId: string): boolean
-	local data = PlayerData.get(player)
-	return data ~= nil and table.find(data.Zones, zoneId) ~= nil
-end
-
 -- Call after changing data: updates leaderstats and the player's HUD.
 function PlayerData.changed(player: Player)
 	local profile = profiles[player]
@@ -181,15 +191,13 @@ function PlayerData.changed(player: Player)
 	end
 	local leaderstats = player:FindFirstChild("leaderstats")
 	if leaderstats then
-		leaderstats.Money.Value = profile.data.Money
-		leaderstats.Rescued.Value = profile.data.TotalRescued
+		leaderstats.Money.Value = math.floor(profile.data.Money)
+		leaderstats.Hatched.Value = profile.data.Hatched
 	end
 	local state = {
 		money = profile.data.Money,
-		rescued = profile.data.TotalRescued,
+		hatched = profile.data.Hatched,
 		upgrades = profile.data.Upgrades,
-		zones = profile.data.Zones,
-		luckBoostLeft = math.max(0, profile.data.LuckBoostUntil - os.time()),
 		saving = profile.canSave,
 	}
 	for _, provider in stateProviders do
@@ -216,7 +224,7 @@ function PlayerData.save(player: Player): boolean
 		end)
 	end)
 	if ok then
-		Leaderboard.submit(player.UserId, snapshot.TotalRescued)
+		Leaderboard.submit(player.UserId, snapshot.Hatched)
 	end
 	return ok
 end
@@ -236,7 +244,7 @@ local function onPlayerAdded(player: Player)
 	profiles[player] = {
 		data = reconcile(if loadedOk then saved else nil),
 		canSave = loadedOk,
-		session = { passes = {}, autoRescue = true },
+		session = { passes = {} },
 	}
 	createLeaderstats(player, profiles[player].data)
 

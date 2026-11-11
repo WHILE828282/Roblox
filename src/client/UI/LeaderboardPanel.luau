@@ -1,5 +1,5 @@
 -- LeaderboardPanel.luau
--- "Top coins" panel on the right side of the screen.
+-- "Top hatchers" panel on the right side of the screen.
 -- Shows the global list the server sends; can be collapsed.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -43,7 +43,7 @@ function LeaderboardPanel.new(screenGui: ScreenGui)
 		TextSize = 18,
 		TextColor3 = Theme.Gold,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = "Top coins  [-]",
+		Text = "Top hatchers  [-]",
 		LayoutOrder = 0,
 		Parent = frame,
 	})
@@ -61,14 +61,14 @@ function LeaderboardPanel.new(screenGui: ScreenGui)
 
 	header.Activated:Connect(function()
 		self.list.Visible = not self.list.Visible
-		header.Text = if self.list.Visible then "Top coins  [-]" else "Top coins  [+]"
+		header.Text = if self.list.Visible then "Top hatchers  [-]" else "Top hatchers  [+]"
 	end)
 
 	self:setEntries({})
 	return self
 end
 
--- entries: { { rank = number, name = string, coins = number }, ... }
+-- entries: { { rank = number, name = string, value = number }, ... }
 function LeaderboardPanel:setEntries(entries)
 	for _, child in self.list:GetChildren() do
 		if child:IsA("GuiObject") then
@@ -116,7 +116,7 @@ function LeaderboardPanel:setEntries(entries)
 			TextSize = 15,
 			TextColor3 = Theme.Gold,
 			TextXAlignment = Enum.TextXAlignment.Right,
-			Text = Format.number(tonumber(entry.coins) or 0),
+			Text = Format.short(tonumber(entry.value) or 0),
 			Parent = row,
 		})
 	end

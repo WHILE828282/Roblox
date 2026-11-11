@@ -25,7 +25,9 @@ return function(tag: string, setup: (Instance) -> Cleanup)
 		end
 		local ok, result = pcall(setup, instance)
 		if not ok then
-			warn(string.format("[Tagged] Failed to set up '%s' (%s): %s", instance:GetFullName(), tag, tostring(result)))
+			warn(
+				string.format("[Tagged] Failed to set up '%s' (%s): %s", instance:GetFullName(), tag, tostring(result))
+			)
 			return
 		end
 		cleanups[instance] = result or false

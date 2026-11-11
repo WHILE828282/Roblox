@@ -2,26 +2,23 @@
 -- Prices and formulas shared by server and client, so the UI always
 -- shows exactly what the server will charge or pay.
 
-local Animals = require(script.Parent.Animals)
+local Dinos = require(script.Parent.Dinos)
 
 local Economy = {}
 
--- Upgrades bought with in-game money.
 Economy.Upgrades = {
-	Speed = { name = "Rescue Speed", maxLevel = 10, baseCost = 300, growth = 3 },
-	Shelter = { name = "Shelter Size", maxLevel = 20, baseCost = 500, growth = 2.2 },
-	Luck = { name = "Luck", maxLevel = 10, baseCost = 1000, growth = 3 },
+	Nests = { name = "More Nests", description = "+1 nest for eggs", maxLevel = 7, baseCost = 400, growth = 6 },
+	Pen = { name = "Bigger Pen", description = "+2 dinosaur slots", maxLevel = 15, baseCost = 600, growth = 3.2 },
+	Strength = { name = "Strength", description = "+5 hit damage", maxLevel = 10, baseCost = 800, growth = 4 },
 }
-Economy.UpgradeOrder = { "Speed", "Shelter", "Luck" }
+Economy.UpgradeOrder = { "Nests", "Pen", "Strength" }
 
-Economy.BaseCapacity = 8
-Economy.CapacityPerLevel = 2
-Economy.BigShelterBonus = 10
-Economy.SpeedPerLevel = 0.9 -- rescue time multiplier per Speed level
-Economy.LuckPerLevel = 0.15 -- +15% luck per Luck level
-Economy.SellSeconds = 60 -- an animal sells for this many seconds of its income
+Economy.BaseNests = 3
+Economy.ExtraNestsPass = 3
+Economy.BasePen = 6
+Economy.PenPerLevel = 2
+Economy.SellSeconds = 120 -- a dinosaur sells for this many seconds of its income
 
--- Cost of the next level, or nil when maxed.
 function Economy.upgradeCost(upgradeId: string, level: number): number?
 	local upgrade = Economy.Upgrades[upgradeId]
 	if not upgrade or level >= upgrade.maxLevel then
@@ -30,42 +27,68 @@ function Economy.upgradeCost(upgradeId: string, level: number): number?
 	return math.floor(upgrade.baseCost * upgrade.growth ^ level)
 end
 
--- Money per second earned by one animal (before gamepass multipliers).
-function Economy.animalIncome(speciesId: string, mutationId: string, zoneId: string?): number
-	local species = Animals.Species[speciesId]
-	local mutation = Animals.Mutations[mutationId] or Animals.Mutations.Normal
-	if not species then
+function Economy.nests(level: number, hasExtraNests: boolean): number
+	return Economy.BaseNests + level + (if hasExtraNests then Economy.ExtraNestsPass else 0)
+end
+
+function Economy.penSize(level: number): number
+	return Economy.BasePen + level * Economy.PenPerLevel
+end
+
+-- 1 = baby, 2 = teen, 3 = adult
+function Economy.stage(tierId: string, growth: number): number
+	local tier = Dinos.TierById[tierId] or Dinos.Tiers[1]
+	if growth >= tier.grow * 2 then
+		return 3
+	elseif growth >= tier.grow then
+		return 2
+	end
+	return 1
+end
+
+-- Seconds of growth left until the next stage (0 when adult).
+function Economy.growthLeft(tierId: string, growth: number): number
+	local tier = Dinos.TierById[tierId] or Dinos.Tiers[1]
+	if growth >= tier.grow * 2 then
+		return 0
+	elseif growth >= tier.grow then
+		return tier.grow * 2 - growth
+	end
+	return tier.grow - growth
+end
+
+-- Money per second from one dinosaur (before the x2 Money pass).
+function Economy.dinoIncome(dino): number
+	local species = Dinos.Species[dino.s]
+	local tier = Dinos.TierById[dino.t]
+	local mutation = Dinos.Mutations[dino.m] or Dinos.Mutations.Normal
+	if not species or not tier then
 		return 0
 	end
-	local zone = Animals.ZoneById[zoneId or species.zone or "Forest"] or Animals.Zones[1]
-	return Animals.Rarities[species.rarity].income * zone.multiplier * mutation.multiplier
+	local stage = Dinos.Stages[Economy.stage(dino.t, dino.g or 0)]
+	return math.floor(species.income * tier.income * mutation.multiplier * stage.income * 10 + 0.5) / 10
 end
 
-function Economy.sellPrice(speciesId: string, mutationId: string, zoneId: string?): number
-	return Economy.animalIncome(speciesId, mutationId, zoneId) * Economy.SellSeconds
+function Economy.sellPrice(dino): number
+	return math.floor(Economy.dinoIncome(dino) * Economy.SellSeconds)
 end
 
-function Economy.capacity(shelterLevel: number, hasBigShelter: boolean): number
-	return Economy.BaseCapacity + shelterLevel * Economy.CapacityPerLevel + (if hasBigShelter then Economy.BigShelterBonus else 0)
+function Economy.hatchTime(tierId: string): number
+	local tier = Dinos.TierById[tierId] or Dinos.Tiers[1]
+	return tier.hatch
 end
 
--- Seconds a player must hold to rescue an animal of this rarity.
-function Economy.rescueTime(rarityId: string, speedLevel: number, hasFastHands: boolean): number
-	local rarity = Animals.Rarities[rarityId] or Animals.Rarities.Common
-	local time = rarity.rescueTime * Economy.SpeedPerLevel ^ speedLevel
-	if hasFastHands then
-		time *= 0.5
-	end
-	return time
+-- Riding speed: species base + 1.5 per tier above Common.
+function Economy.mountSpeed(dino): number
+	local species = Dinos.Species[dino.s]
+	local tier = Dinos.TierById[dino.t] or Dinos.Tiers[1]
+	return (species and species.speed or 20) + (tier.index - 1) * 1.5
 end
 
--- Personal luck multiplier (1 = no bonus).
-function Economy.personalLuck(luckLevel: number, boosted: boolean): number
-	local luck = 1 + luckLevel * Economy.LuckPerLevel
-	if boosted then
-		luck *= 2
-	end
-	return luck
+-- Extra damage a mounted rider deals.
+function Economy.mountDamage(dino): number
+	local tier = Dinos.TierById[dino.t] or Dinos.Tiers[1]
+	return (tier.index - 1) * 4
 end
 
 return Economy

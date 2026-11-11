@@ -1,49 +1,57 @@
 """
 generate_map.py
-Generates map/Map.model.json: the whole 10-level obby course as a Rojo model.
+Generates map/Map.model.json for Dino Raiders: the volcano in the center,
+the egg field with its three rings, six player bases and decorations.
 
 Run from the repository root after changing the layout:
     python tools/generate_map.py
 
-The game logic finds map objects by CollectionService tags, so every special
-part below gets the same tags you would add by hand in Studio:
-  Checkpoint (+ Stage attribute), Finish, Coin, KillPart, Spinner, FadingPlatform
-
-The course runs forward along -Z (the direction a character faces by default).
+Scripts find important parts by CollectionService tags:
+  Volcano  - top of the volcano (eggs fly out of it)
+  BasePlot - a player's base (attribute BaseIndex)
+Eggs only land on parts inside Map/Ground.
 """
 
 import json
+import math
 import os
+import random
 
-COURSE_HEIGHT = 30  # top surface height of the start pad
-THICKNESS = 1  # platform thickness
+random.seed(7)
 
-# Colors (RGB 0-255)
-WHITE = (235, 235, 240)
-STONE = (120, 125, 140)
-GREEN = (80, 205, 120)
-GOLD = (255, 200, 40)
-RED = (230, 50, 50)
-LAVA = (255, 110, 20)
-BLUE = (88, 140, 255)
-PURPLE = (160, 100, 255)
-CYAN = (60, 200, 230)
-PINK = (255, 105, 180)
-ORANGE = (255, 150, 50)
+BASE_COUNT = 6
+BASE_RING_RADIUS = 315
+BASE_SIZE = 72
+HALF_MAP = 420
+INNER_RING = 110  # must match Config.RingRadii.Inner
+MIDDLE_RING = 180  # must match Config.RingRadii.Middle
 
-LEVEL_COLORS = [BLUE, CYAN, PURPLE, ORANGE, PINK, BLUE, CYAN, PURPLE, ORANGE, PINK]
+GRASS = (95, 160, 70)
+DIRT = (165, 130, 85)
+ASH = (70, 60, 60)
+ROCK = (60, 55, 55)
+LAVA = (255, 90, 20)
+SAND = (225, 205, 160)
+WOOD = (110, 75, 45)
+LEAF = (60, 140, 60)
+DARK_LEAF = (40, 110, 50)
+STONE = (130, 130, 135)
+
+IDENTITY = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+# Rotates a Cylinder (axis X) so its axis points up (Y): a flat disc / pillar.
+UPRIGHT = [[0, -1, 0], [1, 0, 0], [0, 0, 1]]
 
 
-def cframe(x, y, z):
-    return {"CFrame": {"position": [x, y, z], "orientation": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}}
+def cframe(x, y, z, orientation=IDENTITY):
+    return {"CFrame": {"position": [x, y, z], "orientation": orientation}}
 
 
 def part(name, center, size, color, material="SmoothPlastic", tags=None, attributes=None,
-         class_name="Part", children=None, **extra):
+         orientation=IDENTITY, children=None, class_name="Part", **extra):
     props = {
         "Anchored": True,
         "Size": list(size),
-        "CFrame": cframe(*center),
+        "CFrame": cframe(*center, orientation=orientation),
         "Color": [c / 255 for c in color],
         "Material": material,
         "TopSurface": "Smooth",
@@ -60,194 +68,126 @@ def part(name, center, size, color, material="SmoothPlastic", tags=None, attribu
     return node
 
 
-def sign(text, color, height=4):
-    """Floating text above a pad (BillboardGui)."""
-    return {
-        "name": "Sign",
-        "className": "BillboardGui",
-        "properties": {
-            "Size": {"UDim2": [[0, 220], [0, 60]]},
-            "StudsOffset": [0, height, 0],
-            "MaxDistance": 150,
-        },
-        "children": [{
-            "name": "Text",
-            "className": "TextLabel",
-            "properties": {
-                "Size": {"UDim2": [[1, 0], [1, 0]]},
-                "BackgroundTransparency": 1,
-                "Text": text,
-                "TextScaled": True,
-                "Font": "GothamBold",
-                "TextColor3": [c / 255 for c in color],
-                "TextStrokeTransparency": 0.3,
-            },
-        }],
-    }
+def disc(name, x, top_y, z, radius, thickness, color, material, **extra):
+    """Flat round part whose top surface is at top_y."""
+    return part(name, (x, top_y - thickness / 2, z), (thickness, radius * 2, radius * 2), color, material,
+                orientation=UPRIGHT, Shape="Cylinder", **extra)
 
 
-class Course:
-    def __init__(self):
-        self.edge = 0.0  # z of the far edge of the last thing placed
-        self.top = COURSE_HEIGHT  # top surface height of the last platform
-        self.folders = []
-        self.items = None
-        self.count = 0
+def folder(name, children):
+    return {"name": name, "className": "Folder", "children": children}
 
-    def folder(self, name):
-        self.items = []
-        self.folders.append({"name": name, "className": "Folder", "children": self.items})
 
-    def add(self, node):
-        self.count += 1
-        self.items.append(node)
-        return node
+def base_centers():
+    centers = []
+    for i in range(BASE_COUNT):
+        angle = math.radians(i * 360 / BASE_COUNT + 30)
+        centers.append((math.cos(angle) * BASE_RING_RADIUS, math.sin(angle) * BASE_RING_RADIUS))
+    return centers
 
-    def platform(self, depth, width, gap, x=0.0, dy=0.0, color=WHITE, name="Platform", **kw):
-        """Places a platform `gap` studs after the previous one; returns its center."""
-        self.top += dy
-        cz = self.edge - gap - depth / 2
-        cy = self.top - THICKNESS / 2
-        self.add(part(name, (x, cy, cz), (width, THICKNESS, depth), color, **kw))
-        self.edge = cz - depth / 2
-        return x, self.top, cz
 
-    def coin(self, x, top, z, value=1):
-        attrs = {"Value": value} if value != 1 else None
-        self.add(part("Coin", (x, top + 3, z), (0.4, 2.5, 2.5), GOLD, material="Neon",
-                      tags=["Coin"], attributes=attrs, Shape="Cylinder", CanCollide=False))
-
-    def checkpoint(self, stage, gap=5):
-        x, top, z = self.platform(12, 12, gap, color=GREEN, name="Checkpoint%d" % stage,
-                                  tags=["Checkpoint"], attributes={"Stage": stage},
-                                  children=[sign("Level %d" % (stage + 1), GREEN)])
-        return x, top, z
+def far_from_bases(x, z, margin):
+    return all(math.hypot(x - bx, z - bz) > BASE_SIZE / 2 + margin for bx, bz in base_centers())
 
 
 def build():
-    c = Course()
+    ground = [
+        part("Ground", (0, -1, 0), (HALF_MAP * 2, 2, HALF_MAP * 2), GRASS, "Grass"),
+        disc("MiddleRing", 0, 0.05, 0, MIDDLE_RING, 0.4, DIRT, "Ground", CanCollide=False),
+        disc("InnerRing", 0, 0.1, 0, INNER_RING, 0.4, ASH, "Basalt", CanCollide=False),
+    ]
 
-    # Start: a SpawnLocation that is also checkpoint Stage 0.
-    c.folder("Start")
-    c.add(part("Start", (0, COURSE_HEIGHT - 0.5, -6), (14, 1, 14), GREEN,
-               class_name="SpawnLocation", tags=["Checkpoint"], attributes={"Stage": 0},
-               children=[sign("Level 1", GREEN, 5)], Duration=0, Neutral=True))
-    c.edge = -13
-
-    # Level 1: easy jumps
-    c.folder("Level01")
-    for i in range(5):
-        x, top, z = c.platform(7, 7, 5, x=[0, 2, -2, 0, 2][i], color=LEVEL_COLORS[0])
-        if i % 2 == 1:
-            c.coin(x, top, z)
-    c.checkpoint(1)
-
-    # Level 2: staircase up
-    c.folder("Level02")
+    # Volcano: stacked rock tiers with a lava crater on top.
+    volcano = []
+    top = 0
+    tiers = [(44, 14), (34, 14), (24, 14), (15, 12)]
+    for i, (radius, height) in enumerate(tiers):
+        volcano.append(part("Tier%d" % (i + 1), (0, top + height / 2, 0), (height, radius * 2, radius * 2), ROCK,
+                            "Basalt", orientation=UPRIGHT, Shape="Cylinder",
+                            tags=["Volcano"] if i == len(tiers) - 1 else None))
+        top += height
+    volcano.append(disc("Crater", 0, top + 0.3, 0, 11, 0.6, LAVA, "Neon", CanCollide=False, children=[
+        {"name": "Fire", "className": "Fire", "properties": {"Size": 25, "Heat": 25}},
+        {"name": "Smoke", "className": "Smoke", "properties": {"Size": 30, "RiseVelocity": 12, "Opacity": 0.15}},
+        {"name": "Glow", "className": "PointLight", "properties": {"Range": 60, "Brightness": 3, "Color": [1, 0.5, 0.2]}},
+    ]))
+    # Lava streams down the sides.
     for i in range(6):
-        x, top, z = c.platform(6, 6, 5, x=[0, 3, 0, -3, 0, 3][i], dy=2.5, color=LEVEL_COLORS[1])
-        if i in (2, 5):
-            c.coin(x, top, z)
-    c.checkpoint(2)
+        angle = i * math.pi / 3 + 0.3
+        for step, (radius, height) in enumerate(tiers[:-1]):
+            y = sum(h for _, h in tiers[: step + 1]) - height / 2
+            volcano.append(part("LavaFlow", (math.cos(angle) * (radius - 0.5), y, math.sin(angle) * (radius - 0.5)),
+                                (3, height, 3), LAVA, "Neon", CanCollide=False))
+    # Glowing cracks in the inner ring.
+    for i in range(14):
+        angle = random.uniform(0, math.pi * 2)
+        radius = random.uniform(55, INNER_RING - 10)
+        length = random.uniform(8, 20)
+        yaw = random.uniform(0, math.pi)
+        c, s = math.cos(yaw), math.sin(yaw)
+        ground.append(part("LavaCrack", (math.cos(angle) * radius, 0.2, math.sin(angle) * radius), (length, 0.3, 1.2),
+                           LAVA, "Neon", orientation=[[c, 0, s], [0, 1, 0], [-s, 0, c]], CanCollide=False))
 
-    # Level 3: zig-zag narrow beams
-    c.folder("Level03")
-    for i in range(5):
-        x, top, z = c.platform(14, 2, 2, x=3 if i % 2 == 0 else -3, color=LEVEL_COLORS[2], name="Beam")
-        if i % 2 == 0:
-            c.coin(x, top, z)
-    c.checkpoint(3)
+    # Player bases.
+    bases = []
+    for index, (x, z) in enumerate(base_centers(), start=1):
+        bases.append(part("Base%d" % index, (x, 0.25, z), (BASE_SIZE, 0.5, BASE_SIZE), SAND, "Sand",
+                          tags=["BasePlot"], attributes={"BaseIndex": index}))
+        for cx in (-1, 1):
+            for cz in (-1, 1):
+                bases.append(part("Post", (x + cx * BASE_SIZE / 2, 3, z + cz * BASE_SIZE / 2), (2, 6, 2), WOOD, "Wood"))
 
-    # Level 4: long floor with lava strips to jump over
-    c.folder("Level04")
-    x, top, z = c.platform(70, 10, 4, color=LEVEL_COLORS[3], name="Floor")
-    start = z + 35
-    for i in range(6):
-        sz = start - 10 - i * 10
-        c.add(part("LavaStrip", (0, top + 0.6, sz), (10, 1.2, 1.5), RED, material="Neon", tags=["KillPart"]))
-        c.coin(0, top, sz - 5)
-    c.checkpoint(4)
+    # Decorations: jungle trees outside the field, rocks in the middle ring.
+    decor = []
+    placed = 0
+    while placed < 70:
+        x, z = random.uniform(-HALF_MAP + 10, HALF_MAP - 10), random.uniform(-HALF_MAP + 10, HALF_MAP - 10)
+        distance = math.hypot(x, z)
+        if distance < 200 or not far_from_bases(x, z, 14):
+            continue
+        height = random.uniform(10, 18)
+        leaf = random.choice([LEAF, DARK_LEAF])
+        decor.append(part("Trunk", (x, height / 2, z), (2.5, height, 2.5), WOOD, "Wood"))
+        decor.append(part("Leaves", (x, height + 3, z), (12, 6, 12), leaf, "Grass"))
+        decor.append(part("Leaves", (x, height + 7, z), (7, 4, 7), leaf, "Grass"))
+        placed += 1
+    for _ in range(18):
+        angle = random.uniform(0, math.pi * 2)
+        radius = random.uniform(INNER_RING + 15, MIDDLE_RING - 5)
+        size = random.uniform(4, 9)
+        decor.append(part("Rock", (math.cos(angle) * radius, size / 2 - 0.5, math.sin(angle) * radius),
+                          (size, size * 0.8, size * 1.2), STONE, "Slate"))
+    for _ in range(25):  # ferns (no collision)
+        x, z = random.uniform(-260, 260), random.uniform(-260, 260)
+        if math.hypot(x, z) < MIDDLE_RING:
+            continue
+        decor.append(part("Fern", (x, 1, z), (4, 2, 4), DARK_LEAF, "Grass", CanCollide=False))
 
-    # Level 5: small pillars
-    c.folder("Level05")
-    for i in range(7):
-        x, top, z = c.platform(3.5, 3.5, 6, x=[0, 3, -3, 0, 4, -2, 0][i], dy=[0, 1, -1, 1, 0, 1, -1][i],
-                               color=LEVEL_COLORS[4], name="Pillar")
-        if i in (3, 6):
-            c.coin(x, top, z, value=2)
-    c.checkpoint(5)
+    # Invisible walls around the map.
+    walls = []
+    for sx, sz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        size = (2, 120, HALF_MAP * 2) if sx else (HALF_MAP * 2, 120, 2)
+        walls.append(part("Wall", (sx * HALF_MAP, 60, sz * HALF_MAP), size, STONE, Transparency=1))
 
-    # Level 6: spinning lava bars
-    c.folder("Level06")
-    for speed in (70, -90):
-        x, top, z = c.platform(26, 26, 5, color=LEVEL_COLORS[5], name="SpinnerFloor")
-        c.add(part("SpinnerBar", (0, top + 1.5, z), (24, 1, 1), RED, material="Neon",
-                   tags=["Spinner", "KillPart"], attributes={"Speed": speed}, CanCollide=False))
-        c.coin(8, top, z - 8)
-    c.checkpoint(6)
+    spawn = part("Spawn", (HALF_MAP - 30, 0.5, HALF_MAP - 30), (10, 1, 10), STONE, "Slate",
+                 class_name="SpawnLocation", Neutral=True, Duration=0)
 
-    # Level 7: platforms that fade away after you step on them
-    c.folder("Level07")
-    for i in range(6):
-        x, top, z = c.platform(6, 6, 5, x=[0, 4, -4, 0, 4, -4][i], color=LEVEL_COLORS[6],
-                               name="FadingPlatform", tags=["FadingPlatform"])
-        if i == 3:
-            c.coin(x, top, z, value=3)
-    c.checkpoint(7)
-
-    # Level 8: climb a tower with a truss, then drop down
-    c.folder("Level08")
-    x, top, z = c.platform(12, 12, 5, color=LEVEL_COLORS[7], name="Base")
-    tower_height = 16
-    tower_depth = 10
-    tower_z = c.edge - tower_depth / 2
-    c.add(part("Tower", (0, top + tower_height / 2, tower_z), (12, tower_height, tower_depth), STONE, material="Slate"))
-    c.add(part("ClimbTruss", (0, top + tower_height / 2, c.edge + 1), (2, tower_height, 2), STONE,
-               class_name="TrussPart", material="DiamondPlate"))
-    c.coin(0, top + tower_height, tower_z)
-    c.edge -= tower_depth
-    c.top = top + tower_height
-    for i in range(4):
-        c.platform(6, 6, 5, x=[2, -2, 2, 0][i], dy=-3, color=LEVEL_COLORS[7])
-    c.checkpoint(8)
-
-    # Level 9: narrow bridge guarded by fast spinners
-    c.folder("Level09")
-    x, top, z = c.platform(66, 3, 4, color=LEVEL_COLORS[8], name="Bridge")
-    for i, speed in enumerate((90, -110, 130)):
-        sz = z + 33 - 15 - i * 18
-        c.add(part("SpinnerBar", (0, top + 1.5, sz), (10, 1, 1), RED, material="Neon",
-                   tags=["Spinner", "KillPart"], attributes={"Speed": speed}, CanCollide=False))
-        c.coin(0, top, sz - 9, value=2)
-    c.checkpoint(9)
-
-    # Level 10: final climb mixing fading and solid steps, then the finish
-    c.folder("Level10")
-    for i in range(8):
-        fading = i % 2 == 1
-        x, top, z = c.platform(5, 5, 6, x=[0, 3, -3, 3, -3, 3, -3, 0][i], dy=1.5,
-                               color=LEVEL_COLORS[9] if not fading else WHITE,
-                               name="FadingPlatform" if fading else "Step",
-                               tags=["FadingPlatform"] if fading else None)
-        if i == 7:
-            c.coin(x, top, z, value=5)
-    x, top, z = c.platform(16, 16, 6, color=GOLD, material="Neon", name="Finish", tags=["Finish"],
-                           children=[sign("FINISH", GOLD, 6)])
-
-    # Lava floor under the whole course: falling = respawn at your checkpoint.
-    length = -c.edge + 80
-    lava = part("LavaFloor", (0, 5, c.edge / 2), (260, 1, length), LAVA, material="CrackedLava", tags=["KillPart"])
-    c.folders.insert(0, {"name": "Hazards", "className": "Folder", "children": [lava]})
-
-    return {"className": "Folder", "children": c.folders}, c.count + 1
+    model = folder("Map", [
+        folder("Ground", ground),
+        folder("Volcano", volcano),
+        folder("Bases", bases),
+        folder("Decor", decor),
+        folder("Boundary", walls + [spawn]),
+    ])
+    model.pop("name")
+    return model
 
 
 if __name__ == "__main__":
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    model, count = build()
     out = os.path.join(root, "map", "Map.model.json")
-    os.makedirs(os.path.dirname(out), exist_ok=True)
+    model = build()
     with open(out, "w") as f:
         json.dump(model, f, indent=1)
         f.write("\n")
-    print("Wrote %s (%d parts)" % (out, count))
+    print("Wrote", out)

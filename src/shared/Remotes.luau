@@ -11,28 +11,36 @@ local FOLDER_NAME = "Remotes"
 local Remotes = {}
 
 -- Server -> client
---   StateChanged(state)        money, income, upgrades... for the HUD
---   ShelterChanged(animals)    the player's rescued animals
+--   StateChanged(state)        money, income, upgrades, riding... for the HUD
+--   BaseChanged(dinos, eggs)   the player's dinosaurs and nest eggs
 --   Notify(message, kind)      short toast message
---   Announce(message)          big banner for everyone (rare rescues, storms)
---   StormChanged(active, endsIn)
---   LeaderboardChanged(list)   global top rescuers
+--   Announce(message, color)   big banner for everyone (rare eggs, eruptions)
+--   Knockback(velocity)        push the local character (server can't move it)
+--   LeaderboardChanged(list)   global top players
 -- Client -> server (always validated on the server!)
 --   RequestSync()              "send me my state"
---   BuyUpgrade(upgradeId)      buy the next level of an upgrade
---   SellAnimal(animalId)       sell one animal from the shelter
---   SetAutoRescue(enabled)     turn the auto rescue gamepass on/off
+--   BuyUpgrade(upgradeId)
+--   SellDino(dinoId)
+--   Ride(dinoId)               ride an adult dinosaur from your pen
+--   Dismount()
+--   Attack()                   swing at the closest player in front of you
+--   UseAbility()               your mount's special ability
+--   LockBase()                 lock your nests for a minute
 Remotes.Names = {
 	StateChanged = "StateChanged",
-	ShelterChanged = "ShelterChanged",
+	BaseChanged = "BaseChanged",
 	Notify = "Notify",
 	Announce = "Announce",
-	StormChanged = "StormChanged",
+	Knockback = "Knockback",
 	LeaderboardChanged = "LeaderboardChanged",
 	RequestSync = "RequestSync",
 	BuyUpgrade = "BuyUpgrade",
-	SellAnimal = "SellAnimal",
-	SetAutoRescue = "SetAutoRescue",
+	SellDino = "SellDino",
+	Ride = "Ride",
+	Dismount = "Dismount",
+	Attack = "Attack",
+	UseAbility = "UseAbility",
+	LockBase = "LockBase",
 }
 
 local function getFolder(): Instance

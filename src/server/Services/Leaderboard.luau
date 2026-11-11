@@ -1,5 +1,5 @@
 -- Leaderboard.luau
--- Global "Top rescuers" leaderboard stored in an OrderedDataStore.
+-- Global "Top hatchers" leaderboard stored in an OrderedDataStore.
 -- Scores are submitted when player data is saved; the top list is
 -- refreshed periodically and sent to every client.
 
@@ -30,7 +30,7 @@ do
 	end
 end
 
--- Stores a player's score (total animals rescued). Safe to call often; errors are only logged.
+-- Stores a player's score (total dinosaurs hatched). Safe to call often; errors are only logged.
 function Leaderboard.submit(userId: number, value: number)
 	if not store then
 		return

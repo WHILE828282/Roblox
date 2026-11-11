@@ -1,59 +1,76 @@
 -- Config.luau
--- Shared settings used by both the server and the client.
--- Gameplay numbers for animals and zones live in Animals.luau,
+-- Shared settings for Dino Raiders, used by both the server and the client.
+-- Dinosaur species, rarities and odds live in Dinos.luau,
 -- prices and formulas in Economy.luau.
 
 local Config = {}
 
 -- CollectionService tags used by the map (see README).
 Config.Tags = {
-	ZoneArea = "ZoneArea", -- ground part of a zone (attribute "Zone")
-	RescueSpot = "RescueSpot", -- invisible part where an animal in trouble can appear (attribute "Zone")
-	ZoneGate = "ZoneGate", -- wall that blocks a locked zone (attribute "Zone" = zone it unlocks)
-	ShelterPlot = "ShelterPlot", -- a player's shelter (attribute "PlotIndex")
+	Volcano = "Volcano", -- top part of the volcano: eggs fly out of it
+	BasePlot = "BasePlot", -- a player's base (attribute "BaseIndex")
 	-- Added at runtime by the server, used by client effects:
 	RainbowPart = "RainbowPart",
 }
 
 -- DataStore settings. Change the "_v1" suffix to start everyone from scratch.
-Config.DataStoreName = "AnimalRescueData_v1"
-Config.LeaderboardStoreName = "AnimalRescueTopRescuers_v1"
+Config.DataStoreName = "DinoRaidersData_v1"
+Config.LeaderboardStoreName = "DinoRaidersTopHatched_v1"
 Config.DataStoreRetries = 3
 Config.AutosaveInterval = 120
 
 -- What a brand new player starts with.
 Config.DefaultData = {
 	Money = 0,
-	TotalRescued = 0,
-	NextId = 1, -- id for the next rescued animal
-	Animals = {}, -- { { id = number, s = speciesId, m = mutationId }, ... }
-	Zones = { "Forest" }, -- unlocked zones
-	Upgrades = { Speed = 0, Shelter = 0, Luck = 0 },
-	LuckBoostUntil = 0, -- os.time() when the paid personal luck boost ends
-	LastSeen = 0, -- os.time() of the last save (for offline income)
+	Hatched = 0, -- total dinosaurs hatched (leaderboard)
+	NextId = 1,
+	Dinos = {}, -- { { id, s = species, t = tier, m = mutation, g = growth seconds }, ... }
+	Eggs = {}, -- eggs in nests: { { id, s, t, m, hatchAt = os.time() }, ... }
+	Upgrades = { Nests = 0, Pen = 0, Strength = 0 },
+	LastSeen = 0,
 	Purchases = {}, -- recent Robux purchase ids (prevents double rewards)
 }
 
--- Rescue spawning
-Config.AnimalsPerZone = 8 -- animals in trouble waiting in every zone
-Config.SpawnInterval = 2 -- seconds between spawn checks
-Config.AnimalLifetime = 180 -- seconds before an unrescued animal is replaced
-Config.RescueDistance = 14 -- max studs between player and animal (anti-exploit)
-Config.HoldTolerance = 0.3 -- seconds of network slack allowed on hold timing
+-- Volcano and eggs
+Config.EruptionInterval = 45 -- seconds between normal eruptions
+Config.EggsPerEruption = 8
+Config.BigEruptionInterval = 600 -- seconds between big eruptions
+Config.BigEruptionEggs = 16
+Config.BigEruptionWarning = 15 -- seconds of warning before a big eruption
+Config.MaxWildEggs = 45
+Config.WildEggLifetime = 240 -- seconds before an untouched egg crumbles
+Config.EggFlightTime = 1.6
+Config.FieldInnerRadius = 45 -- eggs never land closer to the volcano than this
+Config.FieldOuterRadius = 250 -- ...or farther than this
+Config.RingRadii = { Inner = 110, Middle = 180 } -- beyond Middle = Outer ring
+Config.GrabHoldTime = 0.5
+Config.CarryOnFoot = 1 -- eggs a player can carry without a dinosaur
+Config.RareEggAnnounceTier = 4 -- announce eggs of this tier (Legendary) or rarer
 
--- Auto rescue (gamepass)
-Config.AutoRescueRange = 22 -- studs around the player
-Config.AutoRescueSlowdown = 1.5 -- auto rescue takes this much longer than by hand
+-- Bases
+Config.BaseRadius = 34 -- studs from the base center that count as "home"
+Config.StealHoldTime = 3 -- seconds to steal an egg from someone's nest
+Config.LockDuration = 60
+Config.LockCooldown = 180
+Config.GuardInterval = 2 -- seconds between guard dinosaur attacks on thieves
+Config.NewPlayerProtection = 600 -- seconds a brand new player cannot be hurt
 
--- Storm event
-Config.StormInterval = 600 -- seconds between storms
-Config.StormWarning = 10 -- seconds of warning before a storm
-Config.StormDuration = 60 -- seconds a storm lasts
-Config.StormAnimals = 20 -- extra animals that appear during a storm
-Config.StormLuck = 2 -- rarer animals are this much more likely in a storm
+-- Combat
+Config.AttackCooldown = 0.6
+Config.AttackRange = 9
+Config.MountedAttackRange = 13
+Config.BaseDamage = 20
+Config.DamagePerStrength = 5
+Config.Knockback = 55 -- studs/second push on a hit
+Config.AbilityCooldown = 8
+
+-- Stolen mounts
+Config.ClaimHoldTime = 5 -- seconds to saddle a dinosaur whose rider died
+Config.LooseMountTimeout = 120 -- an unclaimed loose mount returns home after this
+Config.SaddleLockTime = 300 -- gamepass: only the owner can saddle it for this long
 
 -- Offline income
-Config.OfflineIncomeShare = 0.25 -- part of normal income earned while offline
+Config.OfflineIncomeShare = 0.25
 Config.OfflineIncomeMaxHours = 8
 
 -- Remote request cooldowns (seconds)
@@ -67,23 +84,22 @@ Config.LeaderboardRefreshInterval = 60
 -- Robux items. Create them on create.roblox.com (README, "Monetization")
 -- and paste the ids here. Items with id 0 show as "Coming soon".
 Config.GamePasses = {
-	DoubleMoney = 0, -- x2 money from all animals
-	AutoRescue = 0, -- rescues nearby animals automatically
-	FastHands = 0, -- rescue twice as fast
-	BigShelter = 0, -- +10 shelter slots
+	DoubleMoney = 0, -- x2 money from all dinosaurs
+	DoubleGrowth = 0, -- dinosaurs grow twice as fast
+	ExtraNests = 0, -- +3 nests
+	SaddleLock = 0, -- after you die, only you can saddle your dinosaur for 5 minutes
 }
 Config.Products = {
-	LuckBoost = 0, -- x2 personal luck for 15 minutes
-	ServerLuck = 0, -- rarer animals for the whole server for 10 minutes
-	SummonStorm = 0, -- start a storm right away
+	InstantHatch = 0, -- hatch the next egg right now
+	HatchAll = 0, -- hatch every egg in your nests
+	ServerLuck = 0, -- rarer eggs for the whole server for 10 minutes
+	BigEruption = 0, -- start a big eruption right away
 	CashSmall = 0, -- 10 minutes of income
-	CashMedium = 0, -- 1 hour of income
-	CashLarge = 0, -- 6 hours of income
+	CashLarge = 0, -- 2 hours of income
 }
-Config.LuckBoostDuration = 15 * 60
 Config.ServerLuckDuration = 10 * 60
 Config.ServerLuckMultiplier = 2
-Config.CashMinutes = { CashSmall = 10, CashMedium = 60, CashLarge = 360 }
-Config.CashMinimum = { CashSmall = 500, CashMedium = 3000, CashLarge = 20000 }
+Config.CashMinutes = { CashSmall = 10, CashLarge = 120 }
+Config.CashMinimum = { CashSmall = 500, CashLarge = 10000 }
 
 return Config
