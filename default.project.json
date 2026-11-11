@@ -30,6 +30,113 @@
         "StreamingEnabled": true,
         "StreamingMinRadius": 160,
         "StreamingTargetRadius": 640
+      },
+      "Terrain": {
+        "$className": "Terrain",
+        "Clouds": {
+          "$className": "Clouds",
+          "$properties": {
+            "Cover": 0.55,
+            "Density": 0.6,
+            "Color": [
+              1,
+              0.95,
+              0.9
+            ]
+          }
+        }
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "Technology": "Future",
+        "Brightness": 2.6,
+        "ClockTime": 16.4,
+        "GeographicLatitude": 28,
+        "Ambient": [
+          0.27,
+          0.24,
+          0.3
+        ],
+        "OutdoorAmbient": [
+          0.5,
+          0.47,
+          0.5
+        ],
+        "ColorShift_Top": [
+          1,
+          0.86,
+          0.66
+        ],
+        "EnvironmentDiffuseScale": 1,
+        "EnvironmentSpecularScale": 1,
+        "ExposureCompensation": 0.15,
+        "ShadowSoftness": 0.25,
+        "GlobalShadows": true
+      },
+      "Atmosphere": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.24,
+          "Offset": 0.2,
+          "Color": [
+            0.86,
+            0.78,
+            0.68
+          ],
+          "Decay": [
+            0.55,
+            0.42,
+            0.36
+          ],
+          "Glare": 0.25,
+          "Haze": 0.9
+        }
+      },
+      "Sky": {
+        "$className": "Sky",
+        "$properties": {
+          "SunAngularSize": 14,
+          "MoonAngularSize": 9,
+          "StarCount": 2500
+        }
+      },
+      "Bloom": {
+        "$className": "BloomEffect",
+        "$properties": {
+          "Intensity": 0.7,
+          "Size": 30,
+          "Threshold": 1.1
+        }
+      },
+      "ColorCorrection": {
+        "$className": "ColorCorrectionEffect",
+        "$properties": {
+          "Saturation": 0.22,
+          "Contrast": 0.12,
+          "Brightness": 0.02,
+          "TintColor": [
+            1,
+            0.97,
+            0.92
+          ]
+        }
+      },
+      "SunRays": {
+        "$className": "SunRaysEffect",
+        "$properties": {
+          "Intensity": 0.12,
+          "Spread": 0.7
+        }
+      },
+      "DepthOfField": {
+        "$className": "DepthOfFieldEffect",
+        "$properties": {
+          "FarIntensity": 0.18,
+          "FocusDistance": 120,
+          "InFocusRadius": 260,
+          "NearIntensity": 0
+        }
       }
     }
   }

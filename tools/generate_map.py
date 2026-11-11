@@ -407,7 +407,12 @@ def build_ground():
 # --------------------------------------------------------------------------
 def build_volcano():
     parts = []
-    tiers = [(92, 16), (80, 16), (68, 16), (57, 16), (46, 16), (36, 16), (27, 14)]
+    # Many thin tiers with a curved profile read as a cone, not as a staircase.
+    steps = 22
+    tiers = []
+    for i in range(steps):
+        t = i / (steps - 1)
+        tiers.append((round(92 - (92 - 27) * (t ** 0.75), 1), 5))
     top = 0.0
     tops = []
     for i, (radius, height) in enumerate(tiers):
