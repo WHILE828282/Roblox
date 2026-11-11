@@ -12,6 +12,7 @@ local Format = require(ReplicatedStorage.Shared.Format)
 local Create = require(script.Parent.Create)
 local Theme = require(script.Parent.Theme)
 local Style = require(script.Parent.Style)
+local Icons = require(script.Parent.Icons)
 
 local Hud = {}
 Hud.__index = Hud
@@ -44,7 +45,11 @@ local function label(props: { [string]: any }): TextLabel
 	return Create("TextLabel", defaults)
 end
 
+-- A glossy button. Extra props: Icon (image id) and Tile (true = square
+-- tile with the icon on top and a small caption under it).
 local function button(props: { [string]: any }, onClick: () -> ()): TextButton
+	local icon, tile = props.Icon, props.Tile
+	props.Icon, props.Tile = nil, nil
 	local defaults = {
 		BackgroundColor3 = Theme.Panel,
 		Font = Theme.BoldFont,
@@ -57,6 +62,27 @@ local function button(props: { [string]: any }, onClick: () -> ()): TextButton
 	end
 	local instance = Create("TextButton", defaults, { corner() })
 	Style.button(instance)
+	if icon then
+		local image = Create("ImageLabel", {
+			Name = "Icon",
+			BackgroundTransparency = 1,
+			Image = icon,
+			ScaleType = Enum.ScaleType.Fit,
+			Parent = instance,
+		})
+		if tile then
+			image.AnchorPoint = Vector2.new(0.5, 0)
+			image.Position = UDim2.new(0.5, 0, 0, 4)
+			image.Size = UDim2.new(0.66, 0, 0.66, 0)
+			instance.TextYAlignment = Enum.TextYAlignment.Bottom
+			Create("UIPadding", { PaddingBottom = UDim.new(0, 5), Parent = instance })
+		else
+			image.AnchorPoint = Vector2.new(0, 0.5)
+			image.Position = UDim2.new(0, -40, 0.5, 0)
+			image.Size = UDim2.fromOffset(36, 36)
+			Create("UIPadding", { PaddingLeft = UDim.new(0, 46), PaddingRight = UDim.new(0, 8), Parent = instance })
+		end
+	end
 	instance.Activated:Connect(onClick)
 	return instance
 end
@@ -103,6 +129,17 @@ function Hud.new(screenGui: ScreenGui, actions)
 		LayoutOrder = 1,
 		Parent = stats,
 	})
+	Create("UIPadding", { PaddingLeft = UDim.new(0, 40), Parent = self.moneyLabel })
+	Create("ImageLabel", {
+		Name = "Coin",
+		BackgroundTransparency = 1,
+		Image = Icons.Coin,
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, -40, 0.5, 0),
+		Size = UDim2.fromOffset(34, 34),
+		Parent = self.moneyLabel,
+	})
+	Style.text(self.moneyLabel, 2)
 	self.incomeLabel = label({ Text = "+$0/s", TextColor3 = Theme.Success, LayoutOrder = 2, Parent = stats })
 	self.baseLabel = label({ Text = "", TextColor3 = Theme.MutedText, TextSize = 14, LayoutOrder = 3, Parent = stats })
 	self.carryLabel = label({
@@ -127,22 +164,27 @@ function Hud.new(screenGui: ScreenGui, actions)
 	-- Menu buttons (under the stats)
 	local menu = Create("Frame", {
 		Name = "Menu",
-		Size = UDim2.new(0, 150, 0, 0),
+		Size = UDim2.new(0, 168, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		LayoutOrder = 2,
 		Parent = column,
 	}, {
-		Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }),
+		Create("UIGridLayout", {
+			CellSize = UDim2.fromOffset(78, 84),
+			CellPadding = UDim2.fromOffset(10, 10),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+		}),
 	})
 	for order, name in { "Dinos", "Upgrades", "Shop", "Odds" } do
 		local colors = { Theme.Success, Theme.Accent, Theme.Gold, Color3.fromRGB(190, 110, 255) }
 		button({
 			Name = name,
 			Text = name,
-			TextSize = 19,
+			TextSize = 15,
+			Icon = Icons[name],
+			Tile = true,
 			BackgroundColor3 = colors[order],
-			Size = UDim2.new(1, 0, 0, 44),
 			LayoutOrder = order,
 			Parent = menu,
 		}, function()
@@ -208,7 +250,7 @@ function Hud.new(screenGui: ScreenGui, actions)
 		Name = "Actions",
 		AnchorPoint = Vector2.new(1, 1),
 		Position = UDim2.new(1, -12, 1, -12),
-		Size = UDim2.new(0, 170, 0, 0),
+		Size = UDim2.new(0, 190, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		Parent = screenGui,
@@ -223,18 +265,19 @@ function Hud.new(screenGui: ScreenGui, actions)
 		),
 	})
 	self.lockButton = button(
-		{ Name = "Lock", Text = "Lock Base", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 1, Parent = actionsFrame },
+		{ Name = "Lock", Icon = Icons.Lock, Text = "Lock Base", Size = UDim2.new(1, 0, 0, 50), LayoutOrder = 1, Parent = actionsFrame },
 		actions.lock
 	)
 	self.dismountButton = button(
-		{ Name = "GetOff", Text = "Get Off", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 2, Visible = false, Parent = actionsFrame },
+		{ Name = "GetOff", Icon = Icons.Exit, Text = "Get Off", Size = UDim2.new(1, 0, 0, 50), LayoutOrder = 2, Visible = false, Parent = actionsFrame },
 		actions.dismount
 	)
 	self.abilityButton = button(
 		{
 			Name = "Ability",
+			Icon = Icons.Ability,
 			Text = "Ability [F]",
-			Size = UDim2.new(1, 0, 0, 48),
+			Size = UDim2.new(1, 0, 0, 56),
 			LayoutOrder = 3,
 			Visible = false,
 			BackgroundColor3 = Theme.Accent,
@@ -245,8 +288,9 @@ function Hud.new(screenGui: ScreenGui, actions)
 	self.hitButton = button(
 		{
 			Name = "Hit",
-			Text = "HIT [Click]",
-			Size = UDim2.new(1, 0, 0, 56),
+			Icon = Icons.Hit,
+			Text = "HIT",
+			Size = UDim2.new(1, 0, 0, 66),
 			LayoutOrder = 4,
 			BackgroundColor3 = Theme.Error,
 			TextSize = 20,
