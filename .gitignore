@@ -14,3 +14,7 @@ sourcemap.json
 
 # Local Roblox Open Cloud API key (used by tools/publish.sh)
 .roblox-api-key
+
+# Models stored in the repository
+!assets/**/*.rbxm
+!assets/*.rbxm

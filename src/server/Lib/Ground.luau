@@ -5,6 +5,15 @@
 
 local Ground = {}
 
+local WALKABLE = {
+	[Enum.Material.Grass] = true,
+	[Enum.Material.Sand] = true,
+	[Enum.Material.Mud] = true,
+	[Enum.Material.Sandstone] = true,
+	[Enum.Material.Basalt] = true,
+	[Enum.Material.Ground] = true,
+}
+
 local params: RaycastParams? = nil
 local groundFolder: Instance? = nil
 
@@ -19,7 +28,8 @@ local function getParams(): RaycastParams?
 	groundFolder = map:FindFirstChild("Ground")
 	local created = RaycastParams.new()
 	created.FilterType = Enum.RaycastFilterType.Include
-	created.FilterDescendantsInstances = { map }
+	created.FilterDescendantsInstances = { map, workspace.Terrain }
+	created.IgnoreWater = false
 	params = created
 	return created
 end
@@ -31,7 +41,17 @@ function Ground.find(x: number, z: number): Vector3?
 		return nil
 	end
 	local result = workspace:Raycast(Vector3.new(x, 700, z), Vector3.new(0, -1400, 0), rayParams)
-	if result and groundFolder and result.Instance:IsDescendantOf(groundFolder) then
+	if not result then
+		return nil
+	end
+	if result.Instance == workspace.Terrain then
+		-- Walkable terrain only: not water, lava or mountain rock.
+		if WALKABLE[result.Material] and result.Position.Y < 40 then
+			return result.Position
+		end
+		return nil
+	end
+	if groundFolder and result.Instance:IsDescendantOf(groundFolder) then
 		return result.Position
 	end
 	return nil

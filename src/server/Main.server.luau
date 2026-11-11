@@ -14,6 +14,9 @@ local Remotes = require(ReplicatedStorage.Shared.Remotes)
 Remotes.createAll()
 
 local Services = script.Parent.Services
+
+-- Build the real terrain first: bases and eggs need the final ground.
+require(Services.Terraform).run()
 local PlayerData = require(Services.PlayerData)
 local Leaderboard = require(Services.Leaderboard)
 local Bases = require(Services.Bases)

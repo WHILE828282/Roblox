@@ -44,6 +44,18 @@
               0.9
             ]
           }
+        },
+        "$properties": {
+          "Decoration": true,
+          "WaterColor": [
+            0.2,
+            0.62,
+            0.78
+          ],
+          "WaterTransparency": 0.55,
+          "WaterReflectance": 0.4,
+          "WaterWaveSize": 0.12,
+          "WaterWaveSpeed": 8
         }
       }
     },
@@ -137,6 +149,11 @@
           "InFocusRadius": 260,
           "NearIntensity": 0
         }
+      }
+    },
+    "ServerStorage": {
+      "MapAssets": {
+        "$path": "assets/map"
       }
     }
   }
