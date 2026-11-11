@@ -4,6 +4,7 @@
 -- at home, the 3D display, income, growth, hatching, the base lock and
 -- guard dinosaurs that push thieves away.
 
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -200,7 +201,51 @@ local function onStealTriggered(owner: Player, eggId: number, thief: Player, sta
 	end
 end
 
--- Rebuilds the eggs and dinosaurs shown on the player's base.
+local function buildNestEgg(player: Player, egg): Model
+	local model = DinoModel.buildEgg(egg.s, egg.t, egg.m)
+	model:SetAttribute("HatchAt", egg.hatchAt)
+	model:SetAttribute("OwnerId", player.UserId)
+	model:SetAttribute("Label", Dinos.displayName(egg.s, egg.t, egg.m))
+	local tier = Dinos.TierById[egg.t]
+	makeBillboard(model.PrimaryPart, "", tier.color, 3, "Timer")
+
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = "Steal"
+	prompt.ObjectText = Dinos.displayName(egg.s, egg.t, egg.m) .. " Egg"
+	prompt.HoldDuration = Config.StealHoldTime
+	prompt.MaxActivationDistance = 10
+	prompt.RequiresLineOfSight = false
+	prompt.Enabled = not Bases.isLocked(player)
+	prompt.Parent = model.PrimaryPart
+	local startedAt = {}
+	prompt.PromptButtonHoldBegan:Connect(function(thief)
+		startedAt[thief] = os.clock()
+	end)
+	prompt.Triggered:Connect(function(thief)
+		onStealTriggered(player, egg.id, thief, startedAt)
+	end)
+	model.Name = "NestEgg"
+	CollectionService:AddTag(model, Config.Tags.NestEgg)
+	return model
+end
+
+-- First free slot number that no entry in `entries` uses.
+local function freeSlot(entries, limit: number): number?
+	local used = {}
+	for _, entry in entries do
+		used[entry.slot] = true
+	end
+	for slot = 1, limit do
+		if not used[slot] then
+			return slot
+		end
+	end
+	return nil
+end
+
+-- Updates the eggs and dinosaurs shown on the player's base. Models are
+-- only created, moved or removed when something really changed, and every
+-- egg and dinosaur keeps its own spot.
 local function refreshDisplay(player: Player)
 	local base = playerBase[player]
 	local data = PlayerData.get(player)
@@ -208,61 +253,64 @@ local function refreshDisplay(player: Player)
 	if not base or not data or not session then
 		return
 	end
-	base.folder:ClearAllChildren()
 
 	-- Nest eggs, each with a hatch timer and a "Steal" prompt for others.
-	for index, egg in data.Eggs do
-		local nest = base.nests[index]
-		if not nest then
-			break
+	local seen = {}
+	for _, egg in data.Eggs do
+		seen[egg.id] = true
+		if not base.eggModels[egg.id] then
+			local slot = freeSlot(base.eggModels, #base.nests)
+			if slot then
+				local model = buildNestEgg(player, egg)
+				model:PivotTo(base.nests[slot] * CFrame.new(0, 2.2, 0))
+				model.Parent = base.folder
+				base.eggModels[egg.id] = { model = model, slot = slot }
+			end
 		end
-		local model = DinoModel.buildEgg(egg.s, egg.t, egg.m)
-		model:PivotTo(nest * CFrame.new(0, 2.2, 0))
-		model:SetAttribute("HatchAt", egg.hatchAt)
-		model:SetAttribute("OwnerId", player.UserId)
-		model:SetAttribute("Label", Dinos.displayName(egg.s, egg.t, egg.m))
-		local tier = Dinos.TierById[egg.t]
-		makeBillboard(model.PrimaryPart, "", tier.color, 3, "Timer")
-
-		local prompt = Instance.new("ProximityPrompt")
-		prompt.ActionText = "Steal"
-		prompt.ObjectText = Dinos.displayName(egg.s, egg.t, egg.m) .. " Egg"
-		prompt.HoldDuration = Config.StealHoldTime
-		prompt.MaxActivationDistance = 10
-		prompt.RequiresLineOfSight = false
-		prompt.Enabled = not Bases.isLocked(player)
-		prompt.Parent = model.PrimaryPart
-		local startedAt = {}
-		prompt.PromptButtonHoldBegan:Connect(function(thief)
-			startedAt[thief] = os.clock()
-		end)
-		prompt.Triggered:Connect(function(thief)
-			onStealTriggered(player, egg.id, thief, startedAt)
-		end)
-		model.Name = "NestEgg"
-		model.Parent = base.folder
+	end
+	for id, entry in base.eggModels do
+		if not seen[id] then
+			entry.model:Destroy()
+			base.eggModels[id] = nil
+		end
 	end
 
-	-- Dinosaurs in the pen, best first, in a grid behind the nests.
-	local sorted = {}
+	-- Dinosaurs in the pen behind the nests.
+	seen = {}
 	for _, dino in data.Dinos do
 		if dino.id ~= session.mountedId then
-			table.insert(sorted, dino)
+			seen[dino.id] = true
+			local stage = Economy.stage(dino.t, dino.g)
+			local entry = base.dinoModels[dino.id]
+			if entry and entry.stage ~= stage then
+				entry.model:Destroy() -- it grew: build the bigger model in the same spot
+				entry.model = nil
+			end
+			if not entry then
+				local slot = freeSlot(base.dinoModels, #base.pen)
+				if slot then
+					entry = { slot = slot }
+					base.dinoModels[dino.id] = entry
+				end
+			end
+			if entry and not entry.model then
+				local model = DinoModel.build(dino.s, dino.t, dino.m, stage)
+				model:PivotTo(base.pen[entry.slot])
+				model:SetAttribute("Stage", stage)
+				CollectionService:AddTag(model, Config.Tags.PenDino)
+				model.Parent = base.folder
+				entry.model = model
+				entry.stage = stage
+			end
 		end
 	end
-	table.sort(sorted, function(a, b)
-		return Economy.dinoIncome(a) > Economy.dinoIncome(b)
-	end)
-	local columns, spacing = 7, 8.5
-	for index, dino in sorted do
-		local column = (index - 1) % columns
-		local row = (index - 1) // columns
-		local x = (column - (columns - 1) / 2) * spacing
-		local z = -4 + row * 8
-		local stage = Economy.stage(dino.t, dino.g)
-		local model = DinoModel.build(dino.s, dino.t, dino.m, stage)
-		model:PivotTo(base.frame * CFrame.new(x, 0, z))
-		model.Parent = base.folder
+	for id, entry in base.dinoModels do
+		if not seen[id] then
+			if entry.model then
+				entry.model:Destroy()
+			end
+			base.dinoModels[id] = nil
+		end
 	end
 	updateSign(base)
 end
@@ -517,8 +565,15 @@ local function spawnAtBase(player: Player, character: Model)
 	if not characterRoot or playerBase[player] ~= base then
 		return
 	end
-	task.wait()
-	character:PivotTo(base.frame * CFrame.new(0, 4, -Config.BaseRadius + 6))
+	local target = base.frame * CFrame.new(0, 4, -Config.BaseRadius + 8)
+	-- The map is streamed: load the area around the base before moving there.
+	pcall(function()
+		player:RequestStreamAroundAsync(target.Position, 5)
+	end)
+	if not character.Parent or playerBase[player] ~= base then
+		return
+	end
+	character:PivotTo(target)
 end
 
 local function assignBase(player: Player)
@@ -543,6 +598,8 @@ local function releaseBase(player: Player)
 	if base then
 		base.owner = nil
 		base.folder:ClearAllChildren()
+		base.eggModels = {}
+		base.dinoModels = {}
 		base.part:SetAttribute("OwnerId", nil)
 		if base.dome then
 			base.dome:Destroy()
@@ -555,7 +612,8 @@ local function releaseBase(player: Player)
 end
 
 local function setupBase(part: BasePart)
-	local center = part.Position + Vector3.new(0, part.Size.Y / 2, 0)
+	-- The BasePlot marker lies on the base floor, in the middle of the base.
+	local center = part.Position
 	-- -Z of the base frame points at the volcano (the map center).
 	local volcano = Vector3.new(0, center.Y, 0)
 	local frame = if (volcano - center).Magnitude > 1 then CFrame.lookAt(center, volcano) else CFrame.new(center)
@@ -564,7 +622,7 @@ local function setupBase(part: BasePart)
 	folder.Name = "Base" .. tostring(part:GetAttribute("BaseIndex") or #bases + 1)
 	folder.Parent = root
 
-	-- Static nests in two rows at the front of the base.
+	-- Static nests in two rows behind the gate.
 	local nests = {}
 	local nestFolder = Instance.new("Folder")
 	nestFolder.Name = folder.Name .. "Nests"
@@ -572,17 +630,35 @@ local function setupBase(part: BasePart)
 	for i = 1, MAX_NEST_SLOTS do
 		local row = if i <= 7 then 0 else 1
 		local column = (i - 1) % 7
-		local nestFrame = frame * CFrame.new((column - 3) * 7, 0, -24 + row * 8)
+		local nestFrame = frame * CFrame.new((column - 3) * 7.5, 0, -30 + row * 9)
 		table.insert(nests, nestFrame)
 		local nest = Instance.new("Part")
 		nest.Name = "Nest"
 		nest.Shape = Enum.PartType.Cylinder
-		nest.Size = Vector3.new(0.8, 5, 5)
+		nest.Size = Vector3.new(0.8, 5.5, 5.5)
 		nest.CFrame = nestFrame * CFrame.new(0, 0.4, 0) * CFrame.Angles(0, 0, math.rad(90))
 		nest.Anchored = true
 		nest.Material = Enum.Material.Grass
 		nest.Color = Color3.fromRGB(140, 100, 55)
 		nest.Parent = nestFolder
+	end
+
+	-- Pen spots: a grid that fills the round floor behind the nests,
+	-- front rows first and from the middle outwards.
+	local pen = {}
+	for z = -10, 36, 9 do
+		local row = {}
+		for x = -38, 38, 9.5 do
+			if math.sqrt(x * x + z * z) <= 40 then
+				table.insert(row, x)
+			end
+		end
+		table.sort(row, function(a, b)
+			return math.abs(a) < math.abs(b)
+		end)
+		for _, x in row do
+			table.insert(pen, frame * CFrame.new(x, 0, z))
+		end
 	end
 
 	local anchor = Instance.new("Part")
@@ -597,9 +673,19 @@ local function setupBase(part: BasePart)
 	anchor.Parent = nestFolder
 	local gui = makeBillboard(anchor, "Free Base", Color3.new(1, 1, 1), 0)
 	gui.Size = UDim2.fromOffset(280, 90)
-	gui.MaxDistance = 300
+	gui.MaxDistance = 260
 
-	local base = { part = part, frame = frame, owner = nil, folder = folder, label = gui.Text, nests = nests }
+	local base = {
+		part = part,
+		frame = frame,
+		owner = nil,
+		folder = folder,
+		label = gui.Text,
+		nests = nests,
+		pen = pen,
+		eggModels = {}, -- [egg id] = { model, slot }
+		dinoModels = {}, -- [dino id] = { model, slot, stage }
+	}
 	table.insert(bases, base)
 	table.sort(bases, function(a, b)
 		return (a.part:GetAttribute("BaseIndex") or 0) < (b.part:GetAttribute("BaseIndex") or 0)

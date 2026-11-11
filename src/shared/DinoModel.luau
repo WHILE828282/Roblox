@@ -225,6 +225,7 @@ function DinoModel.build(speciesId: string, tierId: string, mutationId: string?,
 
 	local model = Instance.new("Model")
 	model.Name = speciesId
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic -- arrives on clients in one piece
 	local root = makePart(model, "Root", Vector3.new(1, 0.2, 1), Vector3.new(0, 0, 0), WHITE)
 	root.Transparency = 1
 	model.PrimaryPart = root
@@ -248,6 +249,7 @@ function DinoModel.buildEgg(speciesId: string, tierId: string, mutationId: strin
 
 	local model = Instance.new("Model")
 	model.Name = "Egg"
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	local size = 2 + tier.index * 0.15
 	local egg = makePart(model, "Shell", Vector3.new(size, size, size), Vector3.new(0, 0, 0), tier.color)
 	egg.Shape = Enum.PartType.Ball

@@ -33,6 +33,7 @@ Remotes.Names = {
 	Announce = "Announce",
 	Knockback = "Knockback",
 	LeaderboardChanged = "LeaderboardChanged",
+	Eruption = "Eruption", -- (big, volcanoTop): rumble, camera shake, fireworks
 	RequestSync = "RequestSync",
 	BuyUpgrade = "BuyUpgrade",
 	SellDino = "SellDino",

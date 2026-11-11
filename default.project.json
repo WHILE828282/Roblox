@@ -25,6 +25,11 @@
     "Workspace": {
       "Map": {
         "$path": "map/Map.model.json"
+      },
+      "$properties": {
+        "StreamingEnabled": true,
+        "StreamingMinRadius": 160,
+        "StreamingTargetRadius": 640
       }
     }
   }

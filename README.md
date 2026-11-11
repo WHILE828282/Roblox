@@ -103,8 +103,8 @@ src/
 
 On <https://create.roblox.com/dashboard/creations> open the experience, or use **File -> Game Settings** in Studio:
 
-1. **Server size = 6** (Places -> your place -> Configure / Game Settings -> Places).
-   The map has 6 bases, one per player.
+1. **Server size = 20** (Places -> your place -> Configure / Game Settings -> Places).
+   The map has 20 bases, one per player.
 2. **Avatar type = R15** (Game Settings -> Avatar). Riding needs R15 characters.
 3. **Enable Studio Access to API Services** (Game Settings -> Security) so saving works when you test in Studio.
 4. When you are ready: make the experience **Public**.
@@ -170,15 +170,21 @@ Rojo overwrites `ServerScriptService.Server`, `StarterPlayerScripts.Client`, `Re
 
 ## 9. The map and its tags
 
-`tools/generate_map.py` builds the map (run `python tools/generate_map.py`, then push).
+`tools/generate_map.py` builds the map (run `python3 tools/generate_map.py`, then push).
 Scripts find important parts by CollectionService tag:
 
 | Tag | Part | Notes |
 | --- | --- | --- |
 | `Volcano` | top tier of the volcano | eggs fly out of its top |
-| `BasePlot` | each player's base (6) | number attribute `BaseIndex` |
+| `BasePlot` | invisible marker in the middle of each base (20) | number attribute `BaseIndex` |
 
-Eggs only land on parts inside `Workspace.Map.Ground`. Ring sizes must match `Config.RingRadii`.
+Eggs only land on parts inside `Workspace.Map.Ground`, and only where nothing else is above the spot.
+The numbers at the top of `tools/generate_map.py` must match `Config.RingRadii`, `Config.FieldInnerRadius`,
+`Config.FieldOuterRadius` and `Config.BaseRadius`.
+
+The map is a valley for 20 players: a big volcano with lava fields in the middle, four biomes (jungle,
+desert with bones, swamp, rocky canyon) separated by shallow rivers with bridges, hills, ruins and mountains
+all around. `StreamingEnabled` is on (see `default.project.json`); the volcano and mountains are always loaded.
 
 ---
 
@@ -197,7 +203,7 @@ Eggs only land on parts inside `Workspace.Map.Ground`. Ring sizes must match `Co
 | --- | --- |
 | "Progress is not being saved" | Step 4.3 (Studio), or Roblox DataStores are down. |
 | Riding looks wrong / floats | Set Avatar type to R15 (step 4.2). |
-| A player gets no base | Server size must be 6 (step 4.1). |
+| A player gets no base | Server size must be 20 (step 4.1). |
 | Shop says "Coming soon" | Create the item and paste its id into Config.luau (step 7). |
 | Workflow HTTP 401 / 403 | API key: `universe-places` Write for this experience, IP `0.0.0.0/0`. |
 | Workflow HTTP 404 | Wrong `UNIVERSE_ID` / `PLACE_ID`. |

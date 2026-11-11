@@ -10,7 +10,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
@@ -27,6 +27,7 @@ local Eggs = {}
 
 local random = Random.new()
 local announceRemote = Remotes.get("Announce")
+local eruptionRemote = Remotes.get("Eruption")
 
 -- wild[model] = { egg = {s,t,m}, createdAt, landed, grabbableAt }
 local wild: { [Model]: any } = {}
@@ -59,21 +60,24 @@ local function ringAt(position: Vector3): string
 	return "Outer"
 end
 
-local function groundAt(x: number, z: number): Vector3
-	return Ground.at(x, z)
-end
-
--- Random landing spot; `ring` forces a ring ("Inner" etc.) or nil for anywhere.
-local function randomLanding(ring: string?): Vector3
+-- Random free landing spot, or nil if none was found.
+-- `ring` forces a ring ("Inner") or nil for anywhere on the field.
+local function randomLanding(ring: string?): Vector3?
 	local minRadius, maxRadius = Config.FieldInnerRadius, Config.FieldOuterRadius
 	if ring == "Inner" then
 		maxRadius = Config.RingRadii.Inner
 	end
-	-- sqrt keeps eggs evenly spread over the area instead of crowding the center
-	local t = random:NextNumber()
-	local radius = math.sqrt(minRadius ^ 2 + t * (maxRadius ^ 2 - minRadius ^ 2))
-	local angle = random:NextNumber() * math.pi * 2
-	return groundAt(math.cos(angle) * radius, math.sin(angle) * radius)
+	for _ = 1, 12 do
+		-- sqrt keeps eggs evenly spread over the area instead of crowding the center
+		local t = random:NextNumber()
+		local radius = math.sqrt(minRadius ^ 2 + t * (maxRadius ^ 2 - minRadius ^ 2))
+		local angle = random:NextNumber() * math.pi * 2
+		local spot = Ground.find(math.cos(angle) * radius, math.sin(angle) * radius)
+		if spot then
+			return spot
+		end
+	end
+	return nil
 end
 
 local function tryGrab(model: Model, player: Player, startedAt: { [Player]: number })
@@ -147,32 +151,25 @@ local function spawnWildEgg(egg, to: Vector3, from: Vector3?)
 		{ egg = egg, createdAt = os.time(), landed = from == nil, grabbableAt = os.clock() + (if from then 0 else 1) }
 	wild[model] = info
 
+	-- The server puts the egg where it will land; clients animate the arc
+	-- themselves (see Effects.luau), so nothing is sent every frame.
+	model:PivotTo(CFrame.new(landing))
 	if from then
-		model:PivotTo(CFrame.new(from))
-		model.Parent = wildFolder
-		-- Fly in an arc; anchored parts moved by the server replicate to everyone.
-		local arcHeight = 40 + (landing - from).Magnitude * 0.25
-		local started = os.clock()
-		local connection
-		connection = RunService.Heartbeat:Connect(function()
-			if not model.Parent then
-				connection:Disconnect()
-				return
-			end
-			local alpha = math.min((os.clock() - started) / Config.EggFlightTime, 1)
-			local position = from:Lerp(landing, alpha) + Vector3.new(0, arcHeight * 4 * alpha * (1 - alpha), 0)
-			model:PivotTo(CFrame.new(position) * CFrame.Angles(alpha * 6, 0, alpha * 3))
-			if alpha >= 1 then
-				connection:Disconnect()
-				model:PivotTo(CFrame.new(landing))
+		local duration = Config.EggFlightTime + (landing - from).Magnitude / Config.EggFlightSpeed
+		model:SetAttribute("FlightFrom", from)
+		model:SetAttribute("FlightStart", workspace:GetServerTimeNow())
+		model:SetAttribute("FlightTime", duration)
+		CollectionService:AddTag(model, Config.Tags.FlyingEgg)
+		task.delay(duration, function()
+			if wild[model] == info then
 				info.landed = true
 				prompt.Enabled = true
+				CollectionService:RemoveTag(model, Config.Tags.FlyingEgg)
 			end
 		end)
-	else
-		model:PivotTo(CFrame.new(landing))
-		model.Parent = wildFolder
 	end
+	model:SetAttribute("TierIndex", tier.index)
+	model.Parent = wildFolder
 	return model
 end
 
@@ -191,11 +188,21 @@ local function announceEgg(egg, prefix: string)
 	end
 end
 
+-- More players = more eggs per eruption.
+local function scaled(minimum: number, maximum: number): number
+	local alpha = math.clamp((#Players:GetPlayers() - 1) / (Config.MaxPlayers - 1), 0, 1)
+	return math.floor(minimum + (maximum - minimum) * alpha + 0.5)
+end
+
 local function erupt(count: number, big: boolean)
 	count = math.min(count, Config.MaxWildEggs - countWild() + (if big then 4 else 0))
+	eruptionRemote:FireAllClients(big, volcanoTop)
 	for i = 1, math.max(count, 0) do
 		task.delay(i * 0.12, function()
 			local landing = randomLanding(nil)
+			if not landing then
+				return
+			end
 			local egg = Dinos.rollEgg(ringAt(landing), luck(), random)
 			spawnWildEgg(egg, landing, volcanoTop)
 			announceEgg(egg, "A ")
@@ -203,7 +210,10 @@ local function erupt(count: number, big: boolean)
 	end
 	if big then
 		task.delay(count * 0.12 + 0.5, function()
-			local landing = randomLanding("Inner")
+			local landing = randomLanding("Inner") or randomLanding(nil)
+			if not landing then
+				return
+			end
 			local egg = Dinos.rollEgg("Big", luck(), random)
 			spawnWildEgg(egg, landing, volcanoTop)
 			announceEgg(egg, "BIG ERUPTION! A ")
@@ -262,7 +272,7 @@ function Eggs.dropCarried(player: Player, position: Vector3?)
 		end
 		if position then
 			local angle = index * 2.1
-			local spot = groundAt(position.X + math.cos(angle) * 4, position.Z + math.sin(angle) * 4)
+			local spot = Ground.below(position + Vector3.new(math.cos(angle) * 4, 0, math.sin(angle) * 4))
 			spawnWildEgg(item.egg, spot, nil)
 		end
 	end
@@ -313,13 +323,21 @@ end
 
 -- Starts an eruption right away (used by DevTools).
 function Eggs.eruptNow(big: boolean)
-	erupt(if big then Config.BigEruptionEggs else Config.EggsPerEruption, big)
+	if big then
+		erupt(scaled(Config.BigEruptionEggsMin, Config.BigEruptionEggs), true)
+	else
+		erupt(scaled(Config.EggsPerEruptionMin, Config.EggsPerEruption), false)
+	end
 end
 
 function Eggs.start()
 	Tagged(Config.Tags.Volcano, function(instance)
 		if instance:IsA("BasePart") then
-			volcanoTop = instance.Position + Vector3.new(0, instance.Size.Y / 2 + 4, 0)
+			-- Works for rotated parts too (the volcano tiers are upright cylinders).
+			local up = instance.CFrame:VectorToObjectSpace(Vector3.yAxis)
+			local size = instance.Size
+			local halfHeight = (math.abs(up.X) * size.X + math.abs(up.Y) * size.Y + math.abs(up.Z) * size.Z) / 2
+			volcanoTop = instance.Position + Vector3.new(0, halfHeight + 4, 0)
 		end
 		return nil
 	end)
@@ -365,7 +383,7 @@ function Eggs.start()
 			local t = os.time()
 			if t >= nextEruption then
 				nextEruption = t + Config.EruptionInterval
-				erupt(Config.EggsPerEruption, false)
+				Eggs.eruptNow(false)
 			end
 			if not bigWarned and t >= nextBigEruption - Config.BigEruptionWarning then
 				bigWarned = true
@@ -377,7 +395,7 @@ function Eggs.start()
 			if t >= nextBigEruption then
 				nextBigEruption = t + Config.BigEruptionInterval
 				bigWarned = false
-				erupt(Config.BigEruptionEggs, true)
+				Eggs.eruptNow(true)
 			end
 			-- Old eggs crumble so the field doesn't fill up.
 			for model, info in wild do

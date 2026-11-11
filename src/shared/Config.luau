@@ -11,6 +11,9 @@ Config.Tags = {
 	BasePlot = "BasePlot", -- a player's base (attribute "BaseIndex")
 	-- Added at runtime by the server, used by client effects:
 	RainbowPart = "RainbowPart",
+	FlyingEgg = "FlyingEgg", -- an egg in the air (clients animate the arc)
+	NestEgg = "NestEgg", -- an egg in a nest (clients show the hatch timer)
+	PenDino = "PenDino", -- a dinosaur standing in a pen
 }
 
 -- DataStore settings. Change the "_v1" suffix to start everyone from scratch.
@@ -33,22 +36,26 @@ Config.DefaultData = {
 
 -- Volcano and eggs
 Config.EruptionInterval = 45 -- seconds between normal eruptions
-Config.EggsPerEruption = 8
+Config.MaxPlayers = 20 -- server size; the map has this many bases
+Config.EggsPerEruption = 25 -- on a full server
+Config.EggsPerEruptionMin = 12 -- with a single player (scales in between)
 Config.BigEruptionInterval = 600 -- seconds between big eruptions
-Config.BigEruptionEggs = 16
+Config.BigEruptionEggs = 50
+Config.BigEruptionEggsMin = 25
 Config.BigEruptionWarning = 15 -- seconds of warning before a big eruption
-Config.MaxWildEggs = 45
+Config.MaxWildEggs = 150
 Config.WildEggLifetime = 240 -- seconds before an untouched egg crumbles
-Config.EggFlightTime = 1.6
-Config.FieldInnerRadius = 45 -- eggs never land closer to the volcano than this
-Config.FieldOuterRadius = 250 -- ...or farther than this
-Config.RingRadii = { Inner = 110, Middle = 180 } -- beyond Middle = Outer ring
+Config.EggFlightTime = 1.4 -- seconds in the air, plus distance / EggFlightSpeed
+Config.EggFlightSpeed = 220
+Config.FieldInnerRadius = 105 -- eggs never land closer to the volcano than this
+Config.FieldOuterRadius = 530 -- ...or farther than this
+Config.RingRadii = { Inner = 240, Middle = 400 } -- beyond Middle = Outer ring
 Config.GrabHoldTime = 0.5
 Config.CarryOnFoot = 1 -- eggs a player can carry without a dinosaur
 Config.RareEggAnnounceTier = 4 -- announce eggs of this tier (Legendary) or rarer
 
 -- Bases
-Config.BaseRadius = 34 -- studs from the base center that count as "home"
+Config.BaseRadius = 46 -- radius of the round base floor: inside it you are "home"
 Config.StealHoldTime = 3 -- seconds to steal an egg from someone's nest
 Config.LockDuration = 60
 Config.LockCooldown = 180

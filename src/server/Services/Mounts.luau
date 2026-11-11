@@ -268,10 +268,7 @@ local function leaveEmptySaddle(ride, position: Vector3)
 	local ownerSession = PlayerData.getSession(owner)
 	local model = DinoModel.build(ride.dino.s, ride.dino.t, ride.dino.m, 3)
 	-- Stand on the ground under the place where the rider died.
-	local ground = Ground.find(position.X, position.Z)
-	if ground and math.abs(ground.Y - position.Y) < 40 then
-		position = ground
-	end
+	position = Ground.below(position + Vector3.new(0, 4, 0))
 	model:PivotTo(CFrame.new(position))
 	model.Name = "EmptySaddle"
 
