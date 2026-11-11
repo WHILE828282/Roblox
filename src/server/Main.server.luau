@@ -21,6 +21,7 @@ local Mounts = require(Services.Mounts)
 local Eggs = require(Services.Eggs)
 local Combat = require(Services.Combat)
 local Shop = require(Services.Shop)
+local DevTools = require(Services.DevTools)
 local RateLimiter = require(script.Parent.Lib.RateLimiter)
 
 -- Map and gameplay services first, PlayerData last so every
@@ -32,6 +33,7 @@ Combat.start()
 Shop.start()
 Leaderboard.start()
 PlayerData.start()
+DevTools.start() -- Studio-only test commands
 
 -- The client asks for its state once its UI is ready.
 local syncLimiter = RateLimiter.new(Config.SyncCooldown)

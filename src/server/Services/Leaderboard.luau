@@ -32,8 +32,8 @@ end
 
 -- Stores a player's score (total dinosaurs hatched). Safe to call often; errors are only logged.
 function Leaderboard.submit(userId: number, value: number)
-	if not store then
-		return
+	if not store or userId <= 0 then
+		return -- no store, or a Studio test account (negative id)
 	end
 	local ok, err = pcall(function()
 		store:SetAsync(tostring(userId), math.max(0, math.floor(value)))

@@ -21,6 +21,7 @@ local PlayerData = require(script.Parent.PlayerData)
 local Bases = require(script.Parent.Bases)
 local Mounts = require(script.Parent.Mounts)
 local Tagged = require(script.Parent.Parent.Lib.Tagged)
+local Ground = require(script.Parent.Parent.Lib.Ground)
 
 local Eggs = {}
 
@@ -58,17 +59,8 @@ local function ringAt(position: Vector3): string
 	return "Outer"
 end
 
--- Finds the ground height at (x, z) by raycasting against the map.
 local function groundAt(x: number, z: number): Vector3
-	local params = RaycastParams.new()
-	local map = workspace:FindFirstChild("Map")
-	map = map and map:FindFirstChild("Ground") or map
-	if map then
-		params.FilterType = Enum.RaycastFilterType.Include
-		params.FilterDescendantsInstances = { map }
-	end
-	local result = workspace:Raycast(Vector3.new(x, 400, z), Vector3.new(0, -800, 0), params)
-	return if result then result.Position else Vector3.new(x, 0, z)
+	return Ground.at(x, z)
 end
 
 -- Random landing spot; `ring` forces a ring ("Inner" etc.) or nil for anywhere.
@@ -317,6 +309,11 @@ function Eggs.triggerBigEruption()
 		nextBigEruption = soon
 		bigWarned = false
 	end
+end
+
+-- Starts an eruption right away (used by DevTools).
+function Eggs.eruptNow(big: boolean)
+	erupt(if big then Config.BigEruptionEggs else Config.EggsPerEruption, big)
 end
 
 function Eggs.start()

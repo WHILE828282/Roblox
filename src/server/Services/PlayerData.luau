@@ -4,6 +4,7 @@
 -- change the data table and then call PlayerData.changed(player).
 
 local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -227,6 +228,34 @@ function PlayerData.save(player: Player): boolean
 		Leaderboard.submit(player.UserId, snapshot.Hatched)
 	end
 	return ok
+end
+
+local function deepEqual(a: any, b: any): boolean
+	if type(a) ~= "table" or type(b) ~= "table" then
+		return a == b
+	end
+	for key, value in a do
+		if not deepEqual(value, b[key]) then
+			return false
+		end
+	end
+	for key in b do
+		if a[key] == nil then
+			return false
+		end
+	end
+	return true
+end
+
+-- Used by DevTools: true if the player's data comes back unchanged after
+-- being encoded like a DataStore does and read by `reconcile` again.
+function PlayerData.roundTripOk(player: Player): boolean
+	local profile = profiles[player]
+	if not profile then
+		return false
+	end
+	local encoded = HttpService:JSONEncode(profile.data)
+	return deepEqual(reconcile(HttpService:JSONDecode(encoded)), profile.data)
 end
 
 local function onPlayerAdded(player: Player)

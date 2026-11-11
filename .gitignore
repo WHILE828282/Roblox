@@ -11,3 +11,6 @@
 Thumbs.db
 .vscode/
 sourcemap.json
+
+# Local Roblox Open Cloud API key (used by tools/publish.sh)
+.roblox-api-key

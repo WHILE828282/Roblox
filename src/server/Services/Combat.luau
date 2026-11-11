@@ -185,6 +185,12 @@ local function onCharacterAdded(player: Player, character: Model)
 	end)
 end
 
+-- Ends the new-player protection early.
+function Combat.clearProtection(player: Player)
+	protectedUntil[player] = nil
+	PlayerData.changed(player)
+end
+
 function Combat.start()
 	PlayerData.addStateProvider(function(player, state)
 		state.protectedLeft = math.max(0, math.floor((protectedUntil[player] or 0) - os.clock()))

@@ -64,15 +64,28 @@ function Hud.new(screenGui: ScreenGui, actions)
 	local self = setmetatable({}, Hud)
 	self.state = nil
 
-	-- Stats (top-left)
+	-- Left column: stats on top, menu buttons under them. It sits in the
+	-- middle of the left edge so it never covers the Roblox chat window.
+	local column = Create("Frame", {
+		Name = "LeftColumn",
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 12, 0.55, 0),
+		Size = UDim2.new(0, 220, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Parent = screenGui,
+	}, {
+		Create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }),
+	})
+
 	local stats = Create("Frame", {
 		Name = "Stats",
-		Position = UDim2.new(0, 12, 0, 12),
-		Size = UDim2.new(0, 220, 0, 0),
+		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Theme.Background,
 		BackgroundTransparency = Theme.BackgroundTransparency,
-		Parent = screenGui,
+		LayoutOrder = 1,
+		Parent = column,
 	}, {
 		corner(),
 		padding(10),
@@ -108,19 +121,19 @@ function Hud.new(screenGui: ScreenGui, actions)
 		Parent = stats,
 	})
 
-	-- Menu buttons (left, under the stats)
+	-- Menu buttons (under the stats)
 	local menu = Create("Frame", {
 		Name = "Menu",
-		Position = UDim2.new(0, 12, 0, 170),
 		Size = UDim2.new(0, 120, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
-		Parent = screenGui,
+		LayoutOrder = 2,
+		Parent = column,
 	}, {
 		Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }),
 	})
 	for order, name in { "Dinos", "Upgrades", "Shop", "Odds" } do
-		button({ Text = name, Size = UDim2.new(1, 0, 0, 38), LayoutOrder = order, Parent = menu }, function()
+		button({ Name = name, Text = name, Size = UDim2.new(1, 0, 0, 38), LayoutOrder = order, Parent = menu }, function()
 			actions.openPanel(name)
 		end)
 	end
@@ -198,15 +211,16 @@ function Hud.new(screenGui: ScreenGui, actions)
 		),
 	})
 	self.lockButton = button(
-		{ Text = "Lock Base", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 1, Parent = actionsFrame },
+		{ Name = "Lock", Text = "Lock Base", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 1, Parent = actionsFrame },
 		actions.lock
 	)
 	self.dismountButton = button(
-		{ Text = "Get Off", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 2, Visible = false, Parent = actionsFrame },
+		{ Name = "GetOff", Text = "Get Off", Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 2, Visible = false, Parent = actionsFrame },
 		actions.dismount
 	)
 	self.abilityButton = button(
 		{
+			Name = "Ability",
 			Text = "Ability [F]",
 			Size = UDim2.new(1, 0, 0, 48),
 			LayoutOrder = 3,
@@ -218,6 +232,7 @@ function Hud.new(screenGui: ScreenGui, actions)
 	)
 	self.hitButton = button(
 		{
+			Name = "Hit",
 			Text = "HIT [Click]",
 			Size = UDim2.new(1, 0, 0, 56),
 			LayoutOrder = 4,

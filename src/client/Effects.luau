@@ -67,21 +67,54 @@ local function startNestTimers()
 end
 
 -- The server can't move a character it doesn't simulate, so it asks us.
+-- For a quarter of a second the character is carried by a LinearVelocity
+-- (the Humanoid would otherwise brake instantly), then it lands on its feet.
+local KNOCKBACK_TIME = 0.25
+
 function Effects.knockback(velocity: Vector3)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-	if not humanoid or not rootPart or typeof(velocity) ~= "Vector3" then
+	if not humanoid or humanoid.Health <= 0 or not rootPart or typeof(velocity) ~= "Vector3" then
 		return
 	end
 	if velocity.Magnitude > 200 then
 		velocity = velocity.Unit * 200
 	end
+	local old = rootPart:FindFirstChild("KnockbackPush")
+	if old then
+		old:Destroy()
+	end
+	local attachment = Instance.new("Attachment")
+	attachment.Name = "KnockbackPush"
+	local push = Instance.new("LinearVelocity")
+	push.Attachment0 = attachment
+	push.RelativeTo = Enum.ActuatorRelativeTo.World
+	push.VelocityConstraintMode = Enum.VelocityConstraintMode.Plane
+	push.PrimaryTangentAxis = Vector3.xAxis
+	push.SecondaryTangentAxis = Vector3.zAxis
+	push.PlaneVelocity = Vector2.new(velocity.X, velocity.Z)
+	push.ForceLimitsEnabled = false
+	push.Parent = attachment
+
 	humanoid.PlatformStand = true
-	rootPart.AssemblyLinearVelocity = velocity
-	task.delay(0.6, function()
-		if humanoid.Parent then
+	attachment.Parent = rootPart
+	rootPart.AssemblyLinearVelocity = Vector3.new(velocity.X, math.clamp(velocity.Y, 0, 40), velocity.Z)
+	rootPart.AssemblyAngularVelocity = Vector3.zero
+
+	task.delay(KNOCKBACK_TIME, function()
+		if attachment.Parent == nil then
+			return -- replaced by a newer knockback
+		end
+		attachment:Destroy()
+		if humanoid.Parent and rootPart.Parent then
+			local current = rootPart.AssemblyLinearVelocity
+			rootPart.AssemblyLinearVelocity = Vector3.new(current.X * 0.2, current.Y, current.Z * 0.2)
+			rootPart.AssemblyAngularVelocity = Vector3.zero
 			humanoid.PlatformStand = false
+			if humanoid.Health > 0 then
+				humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+			end
 		end
 	end)
 end

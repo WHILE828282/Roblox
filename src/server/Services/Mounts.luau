@@ -18,10 +18,14 @@ local DinoModel = require(ReplicatedStorage.Shared.DinoModel)
 local PlayerData = require(script.Parent.PlayerData)
 local Bases = require(script.Parent.Bases)
 local RateLimiter = require(script.Parent.Parent.Lib.RateLimiter)
+local Ground = require(script.Parent.Parent.Lib.Ground)
 
 local Mounts = {}
 
 local DEFAULT_WALK_SPEED = 16
+-- Roblox's standard R15 sitting pose, so the rider sits on the dinosaur's back.
+local SIT_ANIMATION = "rbxassetid://2506281703"
+local SEAT_OFFSET = 0.6 -- how far the rider's hips are above the dinosaur's back
 
 -- rides[player] = { model, dino = {s,t,m,g}, owner = Player, ownerDinoId = number, stolen = boolean }
 local rides: { [Player]: any } = {}
@@ -83,9 +87,26 @@ local function attach(player: Player, dino, owner: Player, ownerDinoId: number, 
 	local backHeight = model:GetAttribute("BackHeight") or 3
 
 	session.originalHipHeight = session.originalHipHeight or humanoid.HipHeight
-	local hipHeight = session.originalHipHeight + backHeight
+	local hipHeight = backHeight + SEAT_OFFSET
 	humanoid.HipHeight = hipHeight
 	humanoid.WalkSpeed = Economy.mountSpeed(dino)
+
+	-- Sitting pose (played on the server so everyone sees it).
+	local sitTrack = nil
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if animator then
+		local animation = Instance.new("Animation")
+		animation.AnimationId = SIT_ANIMATION
+		local ok, track = pcall(function()
+			return animator:LoadAnimation(animation)
+		end)
+		if ok and track then
+			track.Priority = Enum.AnimationPriority.Action
+			track.Looped = true
+			track:Play(0.15)
+			sitTrack = track
+		end
+	end
 
 	local groundOffset = hipHeight + rootPart.Size.Y / 2
 	model:PivotTo(rootPart.CFrame * CFrame.new(0, -groundOffset, 0))
@@ -96,7 +117,14 @@ local function attach(player: Player, dino, owner: Player, ownerDinoId: number, 
 	model.Name = "Mount"
 	model.Parent = player.Character
 
-	rides[player] = { model = model, dino = dino, owner = owner, ownerDinoId = ownerDinoId, stolen = stolen }
+	rides[player] = {
+		model = model,
+		dino = dino,
+		owner = owner,
+		ownerDinoId = ownerDinoId,
+		stolen = stolen,
+		sitTrack = sitTrack,
+	}
 	PlayerData.changed(player)
 	return true
 end
@@ -110,6 +138,10 @@ local function detach(player: Player)
 	end
 	if ride.model then
 		ride.model:Destroy()
+	end
+	if ride.sitTrack then
+		ride.sitTrack:Stop(0.15)
+		ride.sitTrack:Destroy()
 	end
 	local session = PlayerData.getSession(player)
 	local humanoid = getHumanoid(player)
@@ -235,6 +267,11 @@ local function leaveEmptySaddle(ride, position: Vector3)
 	end
 	local ownerSession = PlayerData.getSession(owner)
 	local model = DinoModel.build(ride.dino.s, ride.dino.t, ride.dino.m, 3)
+	-- Stand on the ground under the place where the rider died.
+	local ground = Ground.find(position.X, position.Z)
+	if ground and math.abs(ground.Y - position.Y) < 40 then
+		position = ground
+	end
 	model:PivotTo(CFrame.new(position))
 	model.Name = "EmptySaddle"
 
