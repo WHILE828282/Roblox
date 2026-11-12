@@ -25,9 +25,11 @@ local hud = Hud.new(screenGui, {
 	end,
 	attack = function()
 		Remotes.get("Attack"):FireServer()
+		Effects.sound("swing")
 	end,
 	ability = function()
 		Remotes.get("UseAbility"):FireServer()
+		Effects.sound("ability")
 	end,
 	dismount = function()
 		Remotes.get("Dismount"):FireServer()
@@ -58,6 +60,7 @@ Remotes.get("BaseChanged").OnClientEvent:Connect(function(dinos, eggs)
 end)
 Remotes.get("Notify").OnClientEvent:Connect(function(message, kind)
 	hud:notify(tostring(message), kind)
+	Effects.notifySound(tostring(message), kind)
 end)
 Remotes.get("Announce").OnClientEvent:Connect(function(message, color)
 	hud:announce(tostring(message), if typeof(color) == "Color3" then color else nil)
@@ -65,6 +68,7 @@ end)
 Remotes.get("Knockback").OnClientEvent:Connect(function(velocity)
 	Effects.knockback(velocity)
 	Effects.shake(0.5, 0.35) -- you got hit
+	Effects.sound("hurt")
 end)
 Remotes.get("Eruption").OnClientEvent:Connect(Effects.eruption)
 Remotes.get("LeaderboardChanged").OnClientEvent:Connect(function(entries)
@@ -78,6 +82,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	end
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		Remotes.get("Attack"):FireServer()
+		Effects.sound("swing")
 	end
 end)
 ContextActionService:BindAction("DinoAbility", function(_, inputState)

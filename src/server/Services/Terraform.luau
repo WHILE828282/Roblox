@@ -126,6 +126,14 @@ local function decorate(map: Instance)
 		return if found and found:IsA("Model") then found else nil
 	end
 	local rocks = { "Rock1", "Rock2", "Rock3" }
+	local props = assets:FindFirstChild("Props")
+	local function prop(name: string): Model?
+		local found = props and props:FindFirstChild(name)
+		return if found and found:IsA("Model") then found else nil
+	end
+	-- Block pieces that a single mesh model replaces.
+	local SKELETON = { Spine = true, Rib = true, Jaw = true, Horn = true, Leg = true }
+	local RUIN = { Column = true, Capital = true, Lintel = true, ArchPillar = true, FallenColumn = true, BrokenWall = true }
 
 	for _, folder in decor:GetChildren() do
 		local biome = folder.Name
@@ -154,6 +162,33 @@ local function decorate(map: Instance)
 					part.CastShadow = false
 				end
 			elseif name == "Leaves" or name == "Root" then
+				part:Destroy()
+			elseif name == "Cactus" and prop("Cactus") then
+				local height = part.Size.X
+				place(prop("Cactus") :: Model, part.Position - Vector3.new(0, height / 2, 0), height * 1.15, random, nil).Parent =
+					folder
+				part.Transparency = 1
+				part.CastShadow = false
+			elseif name == "DeadTrunk" and prop("DeadTree") then
+				local height = part.Size.X
+				place(prop("DeadTree") :: Model, part.Position - Vector3.new(0, height / 2, 0), height * 1.2, random, nil).Parent =
+					folder
+				part.Transparency = 1
+				part.CastShadow = false
+			elseif (name == "CactusArm" and prop("Cactus")) or (name == "DeadBranch" and prop("DeadTree")) then
+				part:Destroy()
+			elseif name == "Moss" and (prop("DeadTree") or prop("Ruins")) then
+				part:Destroy()
+			elseif name == "Skull" and prop("Skeleton") then
+				local bottom = part.Position - Vector3.new(0, part.Size.Y * 1.7, 0)
+				place(prop("Skeleton") :: Model, bottom, part.Size.Y * 6, random, nil).Parent = folder
+				part:Destroy()
+			elseif SKELETON[name] and prop("Skeleton") then
+				part:Destroy()
+			elseif name == "RuinFloor" and prop("Ruins") then
+				place(prop("Ruins") :: Model, part.Position - Vector3.new(0, 0.6, 0), 26, random, nil).Parent = folder
+				part:Destroy()
+			elseif RUIN[name] and prop("Ruins") then
 				part:Destroy()
 			elseif name == "Bush" or name == "Reed" then
 				local template = pick(plants)

@@ -108,6 +108,45 @@ local function tryGrab(model: Model, player: Player, startedAt: { [Player]: numb
 	Eggs.carry(player, info.egg)
 end
 
+-- Rare eggs get a tall beam of light and floating sparks, so everyone can
+-- see where the treasure is.
+local function addBeacon(model: Model, tier)
+	local shell = model.PrimaryPart
+	if not shell or tier.index < 3 or shell:FindFirstChild("Sparks") then
+		return
+	end
+	local sparks = Instance.new("ParticleEmitter")
+	sparks.Name = "Sparks"
+	sparks.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	sparks.Color = ColorSequence.new(tier.color)
+	sparks.LightEmission = 0.8
+	sparks.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.9), NumberSequenceKeypoint.new(1, 0) })
+	sparks.Lifetime = NumberRange.new(1, 1.8)
+	sparks.Speed = NumberRange.new(2, 5)
+	sparks.SpreadAngle = Vector2.new(180, 180)
+	sparks.Rate = 4 + tier.index * 3
+	sparks.Parent = shell
+	if tier.index < 4 then
+		return
+	end
+	local height = 40 + tier.index * 14
+	local position = model:GetPivot().Position
+	local beam = Instance.new("Part")
+	beam.Name = "Beacon"
+	beam.Shape = Enum.PartType.Cylinder
+	beam.Size = Vector3.new(height, 1.6, 1.6)
+	beam.CFrame = CFrame.new(position + Vector3.new(0, height / 2, 0)) * CFrame.Angles(0, 0, math.rad(90))
+	beam.Anchored = true
+	beam.CanCollide = false
+	beam.CanTouch = false
+	beam.CanQuery = false
+	beam.CastShadow = false
+	beam.Material = Enum.Material.Neon
+	beam.Color = tier.color
+	beam.Transparency = 0.55
+	beam.Parent = model
+end
+
 -- Creates a wild egg. With `from`, it flies in an arc from there to `to`.
 local function spawnWildEgg(egg, to: Vector3, from: Vector3?)
 	local model = DinoModel.buildEgg(egg.s, egg.t, egg.m)
@@ -166,8 +205,12 @@ local function spawnWildEgg(egg, to: Vector3, from: Vector3?)
 				info.landed = true
 				prompt.Enabled = true
 				CollectionService:RemoveTag(model, Config.Tags.FlyingEgg)
+				addBeacon(model, tier)
 			end
 		end)
+	end
+	if not from then
+		addBeacon(model, tier)
 	end
 	model:SetAttribute("TierIndex", tier.index)
 	model.Parent = wildFolder

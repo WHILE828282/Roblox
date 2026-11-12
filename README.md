@@ -194,7 +194,7 @@ all around. `StreamingEnabled` is on (see `default.project.json`); the volcano a
   (`Raptor`, `Triceratops`, `Stegosaurus`, `TRex`) plus `Egg`. Models must look along -Z.
   `DinoModel.luau` scales them by growth stage and applies Golden / Rainbow looks.
   If a model is missing, a simple blocky dinosaur is built instead, so new species work right away.
-- `assets/map/Nature.rbxm` -> `ServerStorage.MapAssets.Nature`: low-poly trees, ferns and rocks.
+- `assets/map/Nature.model.json` -> `ServerStorage.MapAssets.Nature`: low-poly trees, ferns and rocks.
 - `Terraform.luau` runs when the server starts: it turns the generated map blocks into real terrain
   (grass, sand, water, mountains, the lava volcano) and swaps block trees and rocks for the mesh models.
   In Studio's edit mode you therefore still see plain blocks; press Play to see the real map.

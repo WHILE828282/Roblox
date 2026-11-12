@@ -1,0 +1,2078 @@
+{
+ "className": "Folder",
+ "children": [
+  {
+   "name": "JungleTree1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194742618",
+      "Size": [
+       29.144,
+       50.0,
+       30.244
+      ],
+      "InitialSize": [
+       29.144,
+       50.0,
+       30.244
+      ],
+      "Color": [
+       0.224,
+       0.369,
+       0.184
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         8.6093,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6191430414",
+      "Size": [
+       17.926,
+       60.041,
+       14.572
+      ],
+      "InitialSize": [
+       14.928,
+       50.0,
+       12.135
+      ],
+      "Color": [
+       0.427,
+       0.325,
+       0.286
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2.0853,
+         -3.5889,
+         2.9324
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          -0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          -0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "JungleTree2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194748017",
+      "Size": [
+       30.976,
+       48.392,
+       30.921
+      ],
+      "InitialSize": [
+       31.735,
+       49.578,
+       31.679
+      ],
+      "Color": [
+       0.224,
+       0.369,
+       0.184
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         5.1848,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6191479369",
+      "Size": [
+       13.599,
+       49.586,
+       15.211
+      ],
+      "InitialSize": [
+       13.713,
+       50.0,
+       15.338
+      ],
+      "Color": [
+       0.427,
+       0.325,
+       0.286
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2.0678,
+         -4.5878,
+         -0.5547
+        ],
+        "orientation": [
+         [
+          0.7071,
+          0.0,
+          0.7071
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.7071,
+          0.0,
+          0.7071
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "TallTree1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194728655",
+      "Size": [
+       27.971,
+       27.177,
+       24.028
+      ],
+      "InitialSize": [
+       27.971,
+       27.177,
+       24.028
+      ],
+      "Color": [
+       0.322,
+       0.529,
+       0.267
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         7.1693,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6190981241",
+      "Size": [
+       15.273,
+       37.628,
+       15.599
+      ],
+      "InitialSize": [
+       20.295,
+       50.0,
+       20.728
+      ],
+      "Color": [
+       0.475,
+       0.38,
+       0.29
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2.3104,
+         -1.944,
+         -0.2786
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "TallTree2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194734722",
+      "Size": [
+       28.608,
+       34.55,
+       23.875
+      ],
+      "InitialSize": [
+       25.955,
+       31.346,
+       21.661
+      ],
+      "Color": [
+       0.294,
+       0.486,
+       0.243
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         6.7697,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6190996384",
+      "Size": [
+       15.281,
+       45.266,
+       12.805
+      ],
+      "InitialSize": [
+       16.879,
+       50.0,
+       14.144
+      ],
+      "Color": [
+       0.475,
+       0.38,
+       0.29
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         1.3627,
+         -1.4116,
+         1.9171
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "BirchTree1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199704025",
+      "Size": [
+       2.21,
+       25.564,
+       1.47
+      ],
+      "InitialSize": [
+       4.871,
+       50.0,
+       3.24
+      ],
+      "Color": [
+       0.569,
+       0.467,
+       0.365
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0001,
+         -2.8902,
+         0.0002
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box",
+      "TextureID": "rbxassetid://6199704114"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199812661",
+      "Size": [
+       11.379,
+       18.741,
+       10.276
+      ],
+      "InitialSize": [
+       27.327,
+       50.0,
+       26.988
+      ],
+      "Color": [
+       0.447,
+       0.737,
+       0.365
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         6.3019,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "BirchTree2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199688436",
+      "Size": [
+       6.291,
+       24.837,
+       3.079
+      ],
+      "InitialSize": [
+       12.97,
+       50.0,
+       6.348
+      ],
+      "Color": [
+       0.569,
+       0.467,
+       0.365
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.4228,
+         -4.9386,
+         -0.8059
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box",
+      "TextureID": "rbxassetid://6199688546"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199852521",
+      "Size": [
+       13.01,
+       20.446,
+       9.757
+      ],
+      "InitialSize": [
+       16.228,
+       25.503,
+       12.17
+      ],
+      "Color": [
+       0.447,
+       0.737,
+       0.365
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         7.134,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "BirchTree4",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199733020",
+      "Size": [
+       4.738,
+       24.388,
+       2.373
+      ],
+      "InitialSize": [
+       9.714,
+       50.0,
+       4.867
+      ],
+      "Color": [
+       0.569,
+       0.467,
+       0.365
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -0.1919,
+         -5.5559,
+         0.9378
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box",
+      "TextureID": "rbxassetid://6199733133"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6199856125",
+      "Size": [
+       10.784,
+       18.118,
+       9.219
+      ],
+      "InitialSize": [
+       13.451,
+       22.599,
+       11.5
+      ],
+      "Color": [
+       0.447,
+       0.737,
+       0.365
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         8.691,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "PineTree1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194760834",
+      "Size": [
+       22.409,
+       33.647,
+       21.377
+      ],
+      "InitialSize": [
+       20.712,
+       31.099,
+       19.758
+      ],
+      "Color": [
+       0.318,
+       0.486,
+       0.278
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         3.0478,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6177966904",
+      "Size": [
+       5.692,
+       34.308,
+       7.478
+      ],
+      "InitialSize": [
+       12.33,
+       50.0,
+       16.195
+      ],
+      "Color": [
+       0.478,
+       0.396,
+       0.333
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2.0669,
+         -2.7175,
+         -0.5514
+        ],
+        "orientation": [
+         [
+          0.0,
+          -0.0,
+          -1.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          1.0,
+          0.0,
+          -0.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "PineTree3",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6177967597",
+      "Size": [
+       3.503,
+       23.556,
+       4.533
+      ],
+      "InitialSize": [
+       7.295,
+       50.0,
+       9.44
+      ],
+      "Color": [
+       0.478,
+       0.396,
+       0.333
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         1.2684,
+         -2.6577,
+         -0.1326
+        ],
+        "orientation": [
+         [
+          0.0,
+          -0.0,
+          -1.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          1.0,
+          0.0,
+          -0.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194772928",
+      "Size": [
+       11.643,
+       25.17,
+       11.53
+      ],
+      "InitialSize": [
+       11.643,
+       25.17,
+       11.53
+      ],
+      "Color": [
+       0.318,
+       0.486,
+       0.278
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         1.8506,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "TallerPineTree2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194768710",
+      "Size": [
+       14.536,
+       22.825,
+       13.793
+      ],
+      "InitialSize": [
+       14.536,
+       27.995,
+       13.793
+      ],
+      "Color": [
+       0.267,
+       0.404,
+       0.231
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         7.8386,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6177967350",
+      "Size": [
+       5.648,
+       29.731,
+       8.167
+      ],
+      "InitialSize": [
+       12.606,
+       50.0,
+       18.227
+      ],
+      "Color": [
+       0.439,
+       0.361,
+       0.306
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2.2052,
+         -4.3854,
+         1.6018
+        ],
+        "orientation": [
+         [
+          0.0,
+          -0.0,
+          -1.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          1.0,
+          0.0,
+          -0.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Fern1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194785664",
+      "Size": [
+       4.312,
+       4.274,
+       3.401
+      ],
+      "InitialSize": [
+       4.312,
+       4.274,
+       3.401
+      ],
+      "Color": [
+       0.247,
+       0.408,
+       0.2
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Fern2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194786207",
+      "Size": [
+       6.163,
+       2.843,
+       5.256
+      ],
+      "InitialSize": [
+       6.163,
+       2.843,
+       5.256
+      ],
+      "Color": [
+       0.247,
+       0.408,
+       0.2
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "LargeMushroon",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6191585852",
+      "Size": [
+       3.035,
+       3.175,
+       3.042
+      ],
+      "InitialSize": [
+       49.885,
+       17.508,
+       50.0
+      ],
+      "Color": [
+       0.655,
+       0.376,
+       0.322
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -0.0,
+         1.4991,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          -0.0,
+          0.0
+         ],
+         [
+          -0.0,
+          1.0,
+          -0.0
+         ],
+         [
+          0.0,
+          -0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6191640544",
+      "Size": [
+       1.26,
+       5.51,
+       1.39
+      ],
+      "InitialSize": [
+       11.439,
+       50.0,
+       12.619
+      ],
+      "Color": [
+       0.729,
+       0.722,
+       0.643
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0184,
+         -0.2132,
+         -0.2103
+        ],
+        "orientation": [
+         [
+          0.978,
+          -0.2061,
+          -0.031
+         ],
+         [
+          0.2079,
+          0.9747,
+          0.0818
+         ],
+         [
+          0.0133,
+          -0.0864,
+          0.9962
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "FallenLog",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6195054267",
+      "Size": [
+       5.503,
+       2.06,
+       2.002
+      ],
+      "InitialSize": [
+       50.0,
+       19.181,
+       18.641
+      ],
+      "Color": [
+       0.475,
+       0.38,
+       0.29
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6195096995",
+      "Size": [
+       0.272,
+       1.52,
+       1.535
+      ],
+      "InitialSize": [
+       9.941,
+       50.0,
+       48.784
+      ],
+      "Color": [
+       0.569,
+       0.455,
+       0.349
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         2.4225,
+         -0.005,
+         -0.036
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6195096995",
+      "Size": [
+       0.272,
+       1.55,
+       1.535
+      ],
+      "InitialSize": [
+       9.941,
+       50.0,
+       48.784
+      ],
+      "Color": [
+       0.569,
+       0.455,
+       0.349
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -2.3676,
+         0.01,
+         -0.036
+        ],
+        "orientation": [
+         [
+          -0.9993,
+          -0.0363,
+          0.0011
+         ],
+         [
+          0.0363,
+          -0.9991,
+          -0.0232
+         ],
+         [
+          0.0019,
+          -0.0232,
+          0.9997
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "LargeHollowLog",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194944109",
+      "Size": [
+       14.055,
+       13.037,
+       42.613
+      ],
+      "InitialSize": [
+       16.491,
+       15.297,
+       50.0
+      ],
+      "Color": [
+       0.475,
+       0.38,
+       0.29
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -0.427,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6195018586",
+      "Size": [
+       3.064,
+       1.844,
+       4.95
+      ],
+      "InitialSize": [
+       3.064,
+       1.844,
+       5.01
+      ],
+      "Color": [
+       0.376,
+       0.616,
+       0.31
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         5.9224,
+         5.5166,
+         5.3816
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "MushroomCluster3",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6191620395",
+      "Size": [
+       1.271,
+       3.412,
+       1.36
+      ],
+      "InitialSize": [
+       26.871,
+       50.0,
+       28.737
+      ],
+      "Color": [
+       0.729,
+       0.722,
+       0.643
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0033,
+         -0.0742,
+         -0.0337
+        ],
+        "orientation": [
+         [
+          -1.0,
+          0.0,
+          -0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          -0.0,
+          0.0,
+          -1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    },
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6194810330",
+      "Size": [
+       1.921,
+       1.704,
+       2.131
+      ],
+      "InitialSize": [
+       1.921,
+       1.704,
+       2.131
+      ],
+      "Color": [
+       0.643,
+       0.463,
+       0.729
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.9286,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Grass1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6201037728",
+      "Size": [
+       6.055,
+       9.48,
+       2.538
+      ],
+      "InitialSize": [
+       31.936,
+       50.0,
+       13.384
+      ],
+      "Color": [
+       0.373,
+       0.604,
+       0.302
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Grass2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://6201038423",
+      "Size": [
+       4.754,
+       8.715,
+       3.917
+      ],
+      "InitialSize": [
+       27.276,
+       50.0,
+       22.471
+      ],
+      "Color": [
+       0.373,
+       0.604,
+       0.302
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Rock1",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://7231644778",
+      "Size": [
+       6.0,
+       4.0,
+       6.0
+      ],
+      "InitialSize": [
+       1.82,
+       1.299,
+       2.0
+      ],
+      "Color": [
+       0.624,
+       0.631,
+       0.675
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         -0.1582,
+         0.4648,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Rock2",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://9420263160",
+      "Size": [
+       4.157,
+       4.803,
+       4.372
+      ],
+      "InitialSize": [
+       4.157,
+       4.803,
+       4.372
+      ],
+      "Color": [
+       0.624,
+       0.631,
+       0.675
+      ],
+      "Material": "SmoothPlastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  },
+  {
+   "name": "Rock3",
+   "className": "Model",
+   "children": [
+    {
+     "name": "Mesh",
+     "className": "MeshPart",
+     "properties": {
+      "MeshId": "rbxassetid://2557003083",
+      "Size": [
+       4.215,
+       2.404,
+       4.26
+      ],
+      "InitialSize": [
+       4.215,
+       2.404,
+       4.26
+      ],
+      "Color": [
+       0.624,
+       0.631,
+       0.675
+      ],
+      "Material": "Plastic",
+      "CFrame": {
+       "CFrame": {
+        "position": [
+         0.0,
+         0.0,
+         0.0
+        ],
+        "orientation": [
+         [
+          1.0,
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "Anchored": true,
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CollisionFidelity": "Box"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -303,7 +303,116 @@ function Effects.knockback(velocity: Vector3)
 	end)
 end
 
+---------------------------------------------------------------------------
+-- Living dinosaurs: breathing, looking around, babies wandering
+---------------------------------------------------------------------------
+-- Pen dinosaurs are anchored models placed by the server. Each client moves
+-- the ones near its camera a little every frame; nothing is sent over the
+-- network and the server's positions never change.
+
+local penDinos: { [Model]: { home: CFrame, seed: number } } = {}
+local ANIMATE_DISTANCE = 140
+
+local function startPenDinos()
+	local function add(model: Instance)
+		if model:IsA("Model") and model.PrimaryPart and not penDinos[model] then
+			penDinos[model] = { home = model:GetPivot(), seed = math.random() * 100 }
+		end
+	end
+	CollectionService:GetInstanceAddedSignal(Config.Tags.PenDino):Connect(add)
+	CollectionService:GetInstanceRemovedSignal(Config.Tags.PenDino):Connect(function(model)
+		penDinos[model :: Model] = nil
+	end)
+	for _, model in CollectionService:GetTagged(Config.Tags.PenDino) do
+		add(model)
+	end
+
+	RunService.RenderStepped:Connect(function()
+		local camera = workspace.CurrentCamera
+		if not camera then
+			return
+		end
+		local cameraPosition = camera.CFrame.Position
+		local now = os.clock()
+		for model, info in penDinos do
+			if not model.Parent then
+				penDinos[model] = nil
+				continue
+			end
+			if (info.home.Position - cameraPosition).Magnitude > ANIMATE_DISTANCE then
+				continue
+			end
+			local t = now + info.seed
+			local stage = model:GetAttribute("Stage") or 3
+			local offset
+			if stage == 1 then
+				-- Babies trot around their spot in a lazy figure of eight and hop.
+				local x, z = math.sin(t * 0.7) * 2.6, math.sin(t * 1.4) * 1.3
+				local heading = math.atan2(-math.cos(t * 0.7) * 0.7 * 2.6, -math.cos(t * 1.4) * 1.4 * 1.3)
+				local hop = math.abs(math.sin(t * 5)) * 0.35
+				offset = CFrame.new(x, hop, z) * CFrame.Angles(0, heading, 0)
+			else
+				-- Bigger ones breathe, sway and look around.
+				local breathe = math.sin(t * 1.6) * 0.07
+				offset = CFrame.new(0, breathe + 0.07, 0)
+					* CFrame.Angles(math.sin(t * 1.6) * 0.025, math.sin(t * 0.45) * 0.35, math.sin(t * 0.9) * 0.02)
+			end
+			model:PivotTo(info.home * offset)
+		end
+	end)
+end
+
+---------------------------------------------------------------------------
+-- Sounds (all from Roblox's built-in sound folder, so they always load)
+---------------------------------------------------------------------------
+
+local SOUNDS = {
+	grab = { id = "rbxasset://sounds/electronicpingshort.wav", volume = 0.6, speed = 1.3 },
+	hatch = { id = "rbxasset://sounds/victory.wav", volume = 0.5, speed = 1.15 },
+	coin = { id = "rbxasset://sounds/electronicpingshort.wav", volume = 0.5, speed = 1.8 },
+	error = { id = "rbxasset://sounds/bass.wav", volume = 0.5, speed = 0.8 },
+	swing = { id = "rbxasset://sounds/swordslash.wav", volume = 0.5, speed = 1 },
+	hurt = { id = "rbxasset://sounds/collide.wav", volume = 0.8, speed = 0.9 },
+	ability = { id = "rbxasset://sounds/swordlunge.wav", volume = 0.6, speed = 0.8 },
+	success = { id = "rbxasset://sounds/switch.wav", volume = 0.5, speed = 1.2 },
+}
+local soundCache: { [string]: Sound } = {}
+
+function Effects.sound(name: string)
+	local info = SOUNDS[name]
+	if not info then
+		return
+	end
+	local sound = soundCache[name]
+	if not sound then
+		sound = Instance.new("Sound")
+		sound.Name = "Fx_" .. name
+		sound.SoundId = info.id
+		sound.Volume = info.volume
+		sound.PlaybackSpeed = info.speed
+		sound.Parent = SoundService
+		soundCache[name] = sound
+	end
+	sound:Play()
+end
+
+-- Picks a sound for a server notification.
+function Effects.notifySound(message: string, kind: string?)
+	if string.find(message, "hatched", 1, true) then
+		Effects.sound("hatch")
+	elseif string.find(message, "Got a", 1, true) or string.find(message, "Egg placed", 1, true) then
+		Effects.sound("grab")
+	elseif kind == "coin" then
+		Effects.sound("coin")
+	elseif kind == "error" then
+		Effects.sound("error")
+	elseif kind == "success" then
+		Effects.sound("success")
+	end
+end
+
 function Effects.start()
+	startPenDinos()
 	startRainbow()
 	startNestTimers()
 	startEggFlights()
