@@ -1,112 +1,110 @@
 -- Config.luau
--- Shared settings for Dino Raiders, used by both the server and the client.
--- Dinosaur species, rarities and odds live in Dinos.luau,
--- prices and formulas in Economy.luau.
+-- All settings of "Steal a Sea Monster", shared by the server and the client.
+-- The layout numbers must match tools/generate_map.py.
 
 local Config = {}
 
--- CollectionService tags used by the map (see README).
+Config.MaxPlayers = 6
+
+-- CollectionService tags (see README).
 Config.Tags = {
-	Volcano = "Volcano", -- top part of the volcano: eggs fly out of it
-	BasePlot = "BasePlot", -- a player's base (attribute "BaseIndex")
-	-- Added at runtime by the server, used by client effects:
-	RainbowPart = "RainbowPart",
-	FlyingEgg = "FlyingEgg", -- an egg in the air (clients animate the arc)
-	NestEgg = "NestEgg", -- an egg in a nest (clients show the hatch timer)
-	PenDino = "PenDino", -- a dinosaur standing in a pen
+	BasePlot = "BasePlot", -- invisible marker in the middle of a base (attribute BaseIndex)
+	EggNest = "EggNest", -- a nest in the ocean (attribute Zone)
+	GuardPost = "GuardPost", -- where a zone's guardian sleeps (attribute Zone)
+	DepthArch = "DepthArch", -- glowing arch at the start of a zone (attribute Zone)
+	TrailShop = "TrailShop", -- the stand on the pier
+	-- Added by the server at runtime, used by client effects:
+	Guard = "Guard",
+	Sleeper = "Sleeper",
+	NestEgg = "NestEgg",
+	Creature = "Creature",
 }
 
--- DataStore settings. Change the "_v1" suffix to start everyone from scratch.
-Config.DataStoreName = "DinoRaidersData_v1"
-Config.LeaderboardStoreName = "DinoRaidersTopHatched_v1"
+-- DataStore. This is a new game, so it has its own store.
+Config.DataStoreName = "SeaMonstersData_v1"
 Config.DataStoreRetries = 3
 Config.AutosaveInterval = 120
 
--- What a brand new player starts with.
-Config.DefaultData = {
-	Money = 0,
-	Hatched = 0, -- total dinosaurs hatched (leaderboard)
-	NextId = 1,
-	Dinos = {}, -- { { id, s = species, t = tier, m = mutation, g = growth seconds }, ... }
-	Eggs = {}, -- eggs in nests: { { id, s, t, m, hatchAt = os.time() }, ... }
-	Upgrades = { Nests = 0, Pen = 0, Strength = 0 },
-	LastSeen = 0,
-	Purchases = {}, -- recent Robux purchase ids (prevents double rewards)
-}
+-- Map layout
+Config.OceanStartZ = 110 -- the pier (safe zone with the bases) ends here
+Config.ZoneLength = 100
+Config.CorridorHalfWidth = 35
+Config.Slope = 0.4 -- studs down per stud forward
+Config.BaseHalfWidth = 20 -- along the pier
+Config.BaseHalfDepth = 18 -- from the entrance to the back wall
 
--- Volcano and eggs
-Config.EruptionInterval = 45 -- seconds between normal eruptions
-Config.MaxPlayers = 20 -- server size; the map has this many bases
-Config.EggsPerEruption = 25 -- on a full server
-Config.EggsPerEruptionMin = 12 -- with a single player (scales in between)
-Config.BigEruptionInterval = 600 -- seconds between big eruptions
-Config.BigEruptionEggs = 50
-Config.BigEruptionEggsMin = 25
-Config.BigEruptionWarning = 15 -- seconds of warning before a big eruption
-Config.MaxWildEggs = 150
-Config.WildEggLifetime = 240 -- seconds before an untouched egg crumbles
-Config.EggFlightTime = 1.4 -- seconds in the air, plus distance / EggFlightSpeed
-Config.EggFlightSpeed = 220
-Config.FieldInnerRadius = 105 -- eggs never land closer to the volcano than this
-Config.FieldOuterRadius = 530 -- ...or farther than this
-Config.RingRadii = { Inner = 240, Middle = 400 } -- beyond Middle = Outer ring
-Config.GrabHoldTime = 0.5
-Config.CarryOnFoot = 1 -- eggs a player can carry without a dinosaur
-Config.RareEggAnnounceTier = 4 -- announce eggs of this tier (Legendary) or rarer
+-- Height of the ocean floor at world Z.
+function Config.floorY(z: number): number
+	return if z <= Config.OceanStartZ then 0 else -(z - Config.OceanStartZ) * Config.Slope
+end
 
--- Bases
-Config.BaseRadius = 46 -- radius of the round base floor: inside it you are "home"
-Config.StealHoldTime = 3 -- seconds to steal an egg from someone's nest
-Config.LockDuration = 60
-Config.LockCooldown = 180
-Config.GuardInterval = 2 -- seconds between guard dinosaur attacks on thieves
-Config.NewPlayerProtection = 600 -- seconds a brand new player cannot be hurt
+-- Zone number (1-5) at world Z, or 0 on the pier.
+function Config.zoneAt(z: number): number
+	if z < Config.OceanStartZ then
+		return 0
+	end
+	return math.clamp(math.floor((z - Config.OceanStartZ) / Config.ZoneLength) + 1, 1, 5)
+end
 
--- Combat
-Config.AttackCooldown = 0.6
-Config.AttackRange = 9
-Config.MountedAttackRange = 13
-Config.BaseDamage = 20
-Config.DamagePerStrength = 5
-Config.Knockback = 55 -- studs/second push on a hit
-Config.AbilityCooldown = 8
+-- Players
+Config.StartSpeed = 16
+Config.MaxSpeed = 300
+Config.DashMultiplier = 2
+Config.DashTime = 1.2
+Config.DashCooldown = 6
 
--- Stolen mounts
-Config.ClaimHoldTime = 5 -- seconds to saddle a dinosaur whose rider died
-Config.LooseMountTimeout = 120 -- an unclaimed loose mount returns home after this
-Config.SaddleLockTime = 300 -- gamepass: only the owner can saddle it for this long
+-- Eggs
+Config.GrabHoldTime = 0.6
+Config.NestRespawn = 18 -- seconds until a taken egg appears again
+Config.Incubators = 4
+Config.StealHoldTime = 2.5 -- stealing from another player's incubator
 
--- Offline income
-Config.OfflineIncomeShare = 0.25
-Config.OfflineIncomeMaxHours = 8
+-- Guardians
+Config.GuardCatchDistance = 9
+Config.GuardWakeDelay = 1.2 -- "!" time before the chase starts
+Config.GuardKnockback = 70
 
--- Remote request cooldowns (seconds)
+-- Treadmill: speed gained per second = base + level * perLevel, times the trail multiplier.
+Config.TreadmillBase = 0.25
+Config.TreadmillPerLevel = 0.15
+Config.TreadmillMaxLevel = 20
+Config.TreadmillCost = 150 -- cost of level 1, grows by TreadmillCostGrowth
+Config.TreadmillCostGrowth = 2.1
+
+-- Aquarium
+Config.AquariumBase = 6
+Config.AquariumPerLevel = 2
+Config.AquariumMaxLevel = 7
+Config.AquariumCost = 400
+Config.AquariumCostGrowth = 3
+Config.SellSeconds = 90 -- a creature sells for this many seconds of its income
+
+-- Base lock (water shield)
+Config.LockDuration = 30
+Config.LockCooldown = 120
+
 Config.ActionCooldown = 0.25
-Config.SyncCooldown = 1
 
--- Global leaderboard
-Config.LeaderboardSize = 10
-Config.LeaderboardRefreshInterval = 60
+function Config.treadmillCost(level: number): number?
+	if level >= Config.TreadmillMaxLevel then
+		return nil
+	end
+	return math.floor(Config.TreadmillCost * Config.TreadmillCostGrowth ^ level)
+end
 
--- Robux items. Create them on create.roblox.com (README, "Monetization")
--- and paste the ids here. Items with id 0 show as "Coming soon".
-Config.GamePasses = {
-	DoubleMoney = 0, -- x2 money from all dinosaurs
-	DoubleGrowth = 0, -- dinosaurs grow twice as fast
-	ExtraNests = 0, -- +3 nests
-	SaddleLock = 0, -- after you die, only you can saddle your dinosaur for 5 minutes
-}
-Config.Products = {
-	InstantHatch = 0, -- hatch the next egg right now
-	HatchAll = 0, -- hatch every egg in your nests
-	ServerLuck = 0, -- rarer eggs for the whole server for 10 minutes
-	BigEruption = 0, -- start a big eruption right away
-	CashSmall = 0, -- 10 minutes of income
-	CashLarge = 0, -- 2 hours of income
-}
-Config.ServerLuckDuration = 10 * 60
-Config.ServerLuckMultiplier = 2
-Config.CashMinutes = { CashSmall = 10, CashLarge = 120 }
-Config.CashMinimum = { CashSmall = 500, CashLarge = 10000 }
+function Config.treadmillRate(level: number): number
+	return Config.TreadmillBase + level * Config.TreadmillPerLevel
+end
+
+function Config.aquariumCost(level: number): number?
+	if level >= Config.AquariumMaxLevel then
+		return nil
+	end
+	return math.floor(Config.AquariumCost * Config.AquariumCostGrowth ^ level)
+end
+
+function Config.aquariumSize(level: number): number
+	return Config.AquariumBase + level * Config.AquariumPerLevel
+end
 
 return Config

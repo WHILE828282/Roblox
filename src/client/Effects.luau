@@ -1,39 +1,199 @@
 -- Effects.luau
 -- Purely visual client effects (no gameplay decisions):
---   * rainbow color cycling for Rainbow-mutation parts
---   * hatch timers above eggs in nests
---   * hiding the "Steal" prompt on your own nest eggs
---   * applying knockback sent by the server to your own character
+--   * the water gets deeper, darker and more mysterious as you dive
+--   * a glowing guide beam to your base while you carry an egg
+--   * sleeping guardians breathe, aquarium creatures swim
+--   * hatch timers, treadmill running animation, knockback, shake, sounds
 
 local CollectionService = game:GetService("CollectionService")
-local Debris = game:GetService("Debris")
-local SoundService = game:GetService("SoundService")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local Sea = require(ReplicatedStorage.Shared.Sea)
 local Format = require(ReplicatedStorage.Shared.Format)
 
 local Effects = {}
 
 local player = Players.LocalPlayer
 
-local function startRainbow()
-	local hue = 0
-	local elapsed = 0
-	RunService.Heartbeat:Connect(function(dt)
-		elapsed += dt
-		if elapsed < 0.1 then
+---------------------------------------------------------------------------
+-- Depth: lighting changes smoothly from the sunny pier to the black abyss
+---------------------------------------------------------------------------
+
+local SURFACE = {
+	water = Color3.fromRGB(190, 225, 255),
+	ambient = Color3.fromRGB(150, 150, 160),
+	brightness = 2.6,
+	density = 0.26,
+	haze = 0.6,
+	bloom = 0.35,
+	tint = Color3.new(1, 1, 1),
+}
+
+local function depthLook(depth: number)
+	-- depth: 0 on the pier, 1..5 in the middle of each zone.
+	if depth <= 0 then
+		return SURFACE
+	end
+	local lower = math.clamp(math.floor(depth), 0, 5)
+	local upper = math.clamp(lower + 1, 1, 5)
+	local alpha = depth - lower
+	local function look(index: number)
+		if index == 0 then
+			return SURFACE
+		end
+		local zone = Sea.Zones[index]
+		local k = index / 5
+		return {
+			water = zone.water,
+			ambient = zone.water:Lerp(Color3.new(0, 0, 0), 0.25 + k * 0.35),
+			brightness = 2 - k * 1.7,
+			density = 0.42 + k * 0.22,
+			haze = 1.4 + k * 1.2,
+			bloom = 0.5 + k * 0.6,
+			tint = zone.water:Lerp(Color3.new(1, 1, 1), 0.72 - k * 0.2),
+		}
+	end
+	local a, b = look(lower), look(upper)
+	return {
+		water = a.water:Lerp(b.water, alpha),
+		ambient = a.ambient:Lerp(b.ambient, alpha),
+		brightness = a.brightness + (b.brightness - a.brightness) * alpha,
+		density = a.density + (b.density - a.density) * alpha,
+		haze = a.haze + (b.haze - a.haze) * alpha,
+		bloom = a.bloom + (b.bloom - a.bloom) * alpha,
+		tint = a.tint:Lerp(b.tint, alpha),
+	}
+end
+
+local function startDepth()
+	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
+	local bloom = Lighting:FindFirstChildOfClass("BloomEffect") or Instance.new("BloomEffect", Lighting)
+	local tint = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
+	local current = 0
+	RunService.RenderStepped:Connect(function(dt)
+		local camera = workspace.CurrentCamera
+		if not camera then
 			return
 		end
-		hue = (hue + elapsed * 0.25) % 1
-		elapsed = 0
-		for _, part in CollectionService:GetTagged(Config.Tags.RainbowPart) do
-			if part:IsA("BasePart") then
-				part.Color = Color3.fromHSV(hue, 0.8, 1)
+		local z = camera.Focus.Position.Z
+		local target = math.clamp((z - Config.OceanStartZ) / Config.ZoneLength + 0.5, 0, 5)
+		if z < Config.OceanStartZ then
+			target = 0
+		end
+		current += (target - current) * math.min(1, dt * 2.5) -- smooth, never a hard cut
+		local look = depthLook(current)
+		atmosphere.Color = look.water
+		atmosphere.Decay = look.water:Lerp(Color3.new(0, 0, 0), 0.5)
+		atmosphere.Density = look.density
+		atmosphere.Haze = look.haze
+		Lighting.Ambient = look.ambient
+		Lighting.OutdoorAmbient = look.ambient
+		Lighting.Brightness = look.brightness
+		bloom.Intensity = look.bloom
+		tint.TintColor = look.tint
+	end)
+end
+
+---------------------------------------------------------------------------
+-- Guide beam from you to the entrance of your base while carrying an egg
+---------------------------------------------------------------------------
+
+local guide = nil
+
+local function clearGuide()
+	if guide then
+		for _, instance in guide do
+			instance:Destroy()
+		end
+		guide = nil
+	end
+end
+
+function Effects.setGuide(entrance: Vector3?)
+	local character = player.Character
+	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+	if typeof(entrance) ~= "Vector3" or not rootPart then
+		clearGuide()
+		return
+	end
+	if guide and guide[1].Parent == rootPart then
+		guide[2].WorldPosition = entrance
+		return
+	end
+	clearGuide()
+	local from = Instance.new("Attachment")
+	from.Name = "GuideFrom"
+	from.Position = Vector3.new(0, -2.6, 0)
+	from.Parent = rootPart
+	local to = Instance.new("Attachment")
+	to.Name = "GuideTo"
+	to.Parent = workspace.Terrain
+	to.WorldPosition = entrance
+	local beam = Instance.new("Beam")
+	beam.Attachment0 = from
+	beam.Attachment1 = to
+	beam.Width0 = 2.4
+	beam.Width1 = 2.4
+	beam.FaceCamera = true
+	beam.LightEmission = 1
+	beam.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	beam.TextureLength = 6
+	beam.TextureSpeed = 2.5
+	beam.Color = ColorSequence.new(Color3.fromRGB(120, 255, 200), Color3.fromRGB(90, 200, 255))
+	beam.Transparency = NumberSequence.new(0.15)
+	beam.Parent = rootPart
+	guide = { from, to, beam }
+end
+
+---------------------------------------------------------------------------
+-- Living things: sleeping guardians breathe, aquarium creatures swim
+---------------------------------------------------------------------------
+
+local function animateTagged(tag: string, motion: (number, number) -> CFrame)
+	local homes: { [Model]: { home: CFrame, seed: number } } = {}
+	local function add(model: Instance)
+		if model:IsA("Model") and model.PrimaryPart then
+			homes[model] = { home = model:GetPivot(), seed = math.random() * 100 }
+		end
+	end
+	CollectionService:GetInstanceAddedSignal(tag):Connect(function(model)
+		task.defer(add, model) -- wait until the server finished placing it
+	end)
+	CollectionService:GetInstanceRemovedSignal(tag):Connect(function(model)
+		homes[model :: Model] = nil
+	end)
+	for _, model in CollectionService:GetTagged(tag) do
+		add(model)
+	end
+	RunService.RenderStepped:Connect(function()
+		local camera = workspace.CurrentCamera
+		local now = os.clock()
+		for model, info in homes do
+			if not model.Parent then
+				homes[model] = nil
+			elseif camera and (info.home.Position - camera.CFrame.Position).Magnitude < 220 then
+				model:PivotTo(info.home * motion(now + info.seed, info.seed))
 			end
 		end
+	end)
+end
+
+local function startLife()
+	-- Slow deep breathing.
+	animateTagged(Config.Tags.Sleeper, function(t)
+		return CFrame.new(0, math.sin(t * 1.1) * 0.5, 0) * CFrame.Angles(math.sin(t * 1.1) * 0.04, 0, math.sin(t * 0.55) * 0.03)
+	end)
+	-- Lazy laps inside the tank.
+	animateTagged(Config.Tags.Creature, function(t, seed)
+		local speed = 0.5 + (seed % 7) * 0.05
+		local x, z = math.sin(t * speed) * 2.2, math.sin(t * speed * 2) * 0.9
+		local heading = math.atan2(-math.cos(t * speed) * 2.2, -math.cos(t * speed * 2) * 1.8)
+		return CFrame.new(x, math.sin(t * 1.3) * 0.5, z) * CFrame.Angles(0, heading, math.sin(t * 6) * 0.08)
 	end)
 end
 
@@ -42,17 +202,15 @@ local function startNestTimers()
 		while true do
 			local now = workspace:GetServerTimeNow()
 			for _, model in CollectionService:GetTagged(Config.Tags.NestEgg) do
-				local hatchAt = model:GetAttribute("HatchAt")
 				local primary = model:IsA("Model") and model.PrimaryPart
 				local timer = primary and primary:FindFirstChild("Timer")
 				local label = timer and timer:FindFirstChild("Text")
-				if hatchAt and label then
+				local hatchAt = model:GetAttribute("HatchAt")
+				if label and hatchAt then
 					local left = hatchAt - now
-					label.Text = (model:GetAttribute("Label") or "Egg")
-						.. "\n"
-						.. (if left > 0 then Format.duration(left) else "Hatching!")
+					label.Text = if left > 0 then Format.duration(left) else "Hatching!"
 				end
-				-- Your own eggs can't be stolen by you: hide the prompt.
+				-- You cannot steal your own eggs: hide the prompt.
 				if primary and model:GetAttribute("OwnerId") == player.UserId then
 					local prompt = primary:FindFirstChildOfClass("ProximityPrompt")
 					if prompt and prompt.Enabled then
@@ -66,195 +224,59 @@ local function startNestTimers()
 end
 
 ---------------------------------------------------------------------------
--- Eggs flying out of the volcano
----------------------------------------------------------------------------
--- The server places every egg where it lands and tags it FlyingEgg. Each
--- client draws the arc itself, so the flight is smooth and costs no network.
-
-local flying: { [Model]: { landing: CFrame, trail: Trail? } } = {}
-
-local function landingBurst(model: Model)
-	local primary = model.PrimaryPart
-	if not primary then
-		return
-	end
-	local dust = Instance.new("ParticleEmitter")
-	dust.Texture = "rbxasset://textures/particles/smoke_main.dds"
-	dust.Color = ColorSequence.new(Color3.fromRGB(200, 180, 150))
-	dust.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.5), NumberSequenceKeypoint.new(1, 5) })
-	dust.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 1) })
-	dust.Lifetime = NumberRange.new(0.5, 0.9)
-	dust.Speed = NumberRange.new(6, 12)
-	dust.SpreadAngle = Vector2.new(180, 20)
-	dust.Rate = 0
-	dust.Parent = primary
-	dust:Emit(14)
-	Debris:AddItem(dust, 1.5)
-end
-
-local function addFlyingEgg(model: Instance)
-	if not model:IsA("Model") or not model.PrimaryPart or flying[model] then
-		return
-	end
-	local primary = model.PrimaryPart
-	-- A fiery trail behind the egg.
-	local top = Instance.new("Attachment")
-	top.Position = Vector3.new(0, 0.9, 0)
-	top.Parent = primary
-	local bottom = Instance.new("Attachment")
-	bottom.Position = Vector3.new(0, -0.9, 0)
-	bottom.Parent = primary
-	local trail = Instance.new("Trail")
-	trail.Attachment0 = top
-	trail.Attachment1 = bottom
-	trail.Lifetime = 0.5
-	trail.LightEmission = 1
-	trail.Color = ColorSequence.new(Color3.fromRGB(255, 190, 70), Color3.fromRGB(255, 70, 20))
-	trail.Transparency = NumberSequence.new(0.15, 1)
-	trail.WidthScale = NumberSequence.new(1, 0.2)
-	trail.Parent = primary
-	flying[model] = { landing = model:GetPivot(), trail = trail }
-end
-
-local function finishFlyingEgg(model: Instance)
-	local info = flying[model :: Model]
-	if not info then
-		return
-	end
-	flying[model :: Model] = nil
-	if model.Parent and model:IsA("Model") then
-		model:PivotTo(info.landing)
-		landingBurst(model)
-		if info.trail then
-			Debris:AddItem(info.trail, 0.6)
-		end
-	end
-end
-
-local function startEggFlights()
-	CollectionService:GetInstanceAddedSignal(Config.Tags.FlyingEgg):Connect(addFlyingEgg)
-	CollectionService:GetInstanceRemovedSignal(Config.Tags.FlyingEgg):Connect(finishFlyingEgg)
-	for _, model in CollectionService:GetTagged(Config.Tags.FlyingEgg) do
-		addFlyingEgg(model)
-	end
-	RunService.RenderStepped:Connect(function()
-		local now = workspace:GetServerTimeNow()
-		for model, info in flying do
-			local from = model:GetAttribute("FlightFrom")
-			local started = model:GetAttribute("FlightStart")
-			local duration = model:GetAttribute("FlightTime")
-			if not model.Parent or typeof(from) ~= "Vector3" or not started or not duration then
-				flying[model] = nil
-				continue
-			end
-			local alpha = math.clamp((now - started) / duration, 0, 1)
-			if alpha >= 1 then
-				finishFlyingEgg(model)
-				continue
-			end
-			local to = info.landing.Position
-			local arcHeight = 50 + (to - from).Magnitude * 0.3
-			local position = from:Lerp(to, alpha) + Vector3.new(0, arcHeight * 4 * alpha * (1 - alpha), 0)
-			model:PivotTo(CFrame.new(position) * CFrame.Angles(alpha * 14, 0, alpha * 9))
-		end
-	end)
-end
-
----------------------------------------------------------------------------
--- Eruption: rumble, camera shake and a fire burst from the crater
+-- Treadmill: run on the spot while the server says you are training
 ---------------------------------------------------------------------------
 
-local shakeUntil, shakePower = 0, 0
+local RUN_ANIMATION = "rbxassetid://913376220" -- Roblox's standard R15 run
 
-function Effects.shake(power: number, seconds: number)
-	shakePower = math.max(power, if os.clock() < shakeUntil then shakePower else 0)
-	shakeUntil = math.max(shakeUntil, os.clock() + seconds)
-end
-
-local function startCameraShake()
-	RunService:BindToRenderStep("DinoCameraShake", Enum.RenderPriority.Camera.Value + 1, function()
-		local left = shakeUntil - os.clock()
-		local camera = workspace.CurrentCamera
-		if left <= 0 or not camera then
+local function startTreadmill()
+	local track: AnimationTrack? = nil
+	local function watch(character: Model)
+		track = nil
+		local humanoid = character:WaitForChild("Humanoid", 10) :: Humanoid?
+		local animator = humanoid and humanoid:WaitForChild("Animator", 10) :: Animator?
+		if not animator then
 			return
 		end
-		local strength = shakePower * math.min(left, 1)
-		camera.CFrame *= CFrame.new(
-			(math.random() - 0.5) * strength,
-			(math.random() - 0.5) * strength,
-			0
-		) * CFrame.Angles(0, 0, (math.random() - 0.5) * strength * 0.02)
-	end)
-end
-
-function Effects.eruption(big: boolean, volcanoTop: Vector3)
-	if typeof(volcanoTop) ~= "Vector3" then
-		return
+		local function update()
+			local training = character:GetAttribute("Training") == true
+			if training and not track then
+				local animation = Instance.new("Animation")
+				animation.AnimationId = RUN_ANIMATION
+				local ok, loaded = pcall(function()
+					return animator:LoadAnimation(animation)
+				end)
+				if ok and loaded then
+					loaded.Priority = Enum.AnimationPriority.Action
+					loaded.Looped = true
+					track = loaded
+				end
+			end
+			if track then
+				if training and not track.IsPlaying then
+					track:Play(0.2, 1, 1.4)
+					Effects.sound("train")
+				elseif not training and track.IsPlaying then
+					track:Stop(0.2)
+				end
+			end
+		end
+		character:GetAttributeChangedSignal("Training"):Connect(update)
+		update()
 	end
-	local camera = workspace.CurrentCamera
-	local distance = if camera then (camera.CFrame.Position - volcanoTop).Magnitude else 1000
-	-- Closer to the volcano = stronger shake.
-	local closeness = math.clamp(1.15 - distance / 900, 0.2, 1)
-	Effects.shake((if big then 1.4 else 0.6) * closeness, if big then 5 else 2)
-
-	local rumble = Instance.new("Sound")
-	rumble.SoundId = "rbxasset://sounds/Rocket shot.wav"
-	rumble.PlaybackSpeed = if big then 0.35 else 0.5
-	rumble.Volume = (if big then 1.2 else 0.7) * closeness
-	rumble.Parent = SoundService
-	rumble:Play()
-	Debris:AddItem(rumble, 6)
-
-	-- Fire and ash shooting out of the crater.
-	local emitterPart = Instance.new("Part")
-	emitterPart.Anchored = true
-	emitterPart.CanCollide = false
-	emitterPart.CanQuery = false
-	emitterPart.Transparency = 1
-	emitterPart.Size = Vector3.new(30, 1, 30)
-	emitterPart.Position = volcanoTop
-	local fire = Instance.new("ParticleEmitter")
-	fire.Texture = "rbxasset://textures/particles/fire_main.dds"
-	fire.LightEmission = 1
-	fire.Color = ColorSequence.new(Color3.fromRGB(255, 220, 120), Color3.fromRGB(255, 60, 10))
-	fire.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 14), NumberSequenceKeypoint.new(1, 30) })
-	fire.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 1) })
-	fire.Lifetime = NumberRange.new(1.5, 3)
-	fire.Speed = NumberRange.new(60, if big then 170 else 110)
-	fire.SpreadAngle = Vector2.new(22, 22)
-	fire.Acceleration = Vector3.new(0, -40, 0)
-	fire.EmissionDirection = Enum.NormalId.Top
-	fire.Rate = if big then 90 else 45
-	fire.Parent = emitterPart
-	local ash = fire:Clone()
-	ash.Texture = "rbxasset://textures/particles/smoke_main.dds"
-	ash.LightEmission = 0
-	ash.Color = ColorSequence.new(Color3.fromRGB(70, 62, 60))
-	ash.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 20), NumberSequenceKeypoint.new(1, 70) })
-	ash.Lifetime = NumberRange.new(4, 7)
-	ash.Speed = NumberRange.new(30, 70)
-	ash.Acceleration = Vector3.new(0, 6, 0)
-	ash.Rate = if big then 30 else 14
-	ash.Parent = emitterPart
-	local flash = Instance.new("PointLight")
-	flash.Color = Color3.fromRGB(255, 140, 50)
-	flash.Range = 60
-	flash.Brightness = if big then 12 else 6
-	flash.Parent = emitterPart
-	emitterPart.Parent = workspace
-	task.delay(if big then 7 else 3.5, function()
-		fire.Enabled = false
-		ash.Enabled = false
-		flash.Enabled = false
-	end)
-	Debris:AddItem(emitterPart, if big then 15 else 11)
+	player.CharacterAdded:Connect(watch)
+	if player.Character then
+		task.spawn(watch, player.Character)
+	end
 end
 
--- The server can't move a character it doesn't simulate, so it asks us.
--- For a quarter of a second the character is carried by a LinearVelocity
--- (the Humanoid would otherwise brake instantly), then it lands on its feet.
-local KNOCKBACK_TIME = 0.25
+---------------------------------------------------------------------------
+-- Knockback, camera shake, sounds
+---------------------------------------------------------------------------
 
+-- The server cannot move a character it does not simulate, so it asks us.
+-- For a quarter of a second a LinearVelocity carries the character, then it
+-- lands on its feet.
 function Effects.knockback(velocity: Vector3)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -280,15 +302,13 @@ function Effects.knockback(velocity: Vector3)
 	push.PlaneVelocity = Vector2.new(velocity.X, velocity.Z)
 	push.ForceLimitsEnabled = false
 	push.Parent = attachment
-
 	humanoid.PlatformStand = true
 	attachment.Parent = rootPart
 	rootPart.AssemblyLinearVelocity = Vector3.new(velocity.X, math.clamp(velocity.Y, 0, 40), velocity.Z)
 	rootPart.AssemblyAngularVelocity = Vector3.zero
-
-	task.delay(KNOCKBACK_TIME, function()
+	task.delay(0.25, function()
 		if attachment.Parent == nil then
-			return -- replaced by a newer knockback
+			return
 		end
 		attachment:Destroy()
 		if humanoid.Parent and rootPart.Parent then
@@ -301,80 +321,28 @@ function Effects.knockback(velocity: Vector3)
 			end
 		end
 	end)
+	Effects.shake(0.6, 0.4)
+	Effects.sound("hurt")
 end
 
----------------------------------------------------------------------------
--- Living dinosaurs: breathing, looking around, babies wandering
----------------------------------------------------------------------------
--- Pen dinosaurs are anchored models placed by the server. Each client moves
--- the ones near its camera a little every frame; nothing is sent over the
--- network and the server's positions never change.
+local shakeUntil, shakePower = 0, 0
 
-local penDinos: { [Model]: { home: CFrame, seed: number } } = {}
-local ANIMATE_DISTANCE = 140
-
-local function startPenDinos()
-	local function add(model: Instance)
-		if model:IsA("Model") and model.PrimaryPart and not penDinos[model] then
-			penDinos[model] = { home = model:GetPivot(), seed = math.random() * 100 }
-		end
-	end
-	CollectionService:GetInstanceAddedSignal(Config.Tags.PenDino):Connect(add)
-	CollectionService:GetInstanceRemovedSignal(Config.Tags.PenDino):Connect(function(model)
-		penDinos[model :: Model] = nil
-	end)
-	for _, model in CollectionService:GetTagged(Config.Tags.PenDino) do
-		add(model)
-	end
-
-	RunService.RenderStepped:Connect(function()
-		local camera = workspace.CurrentCamera
-		if not camera then
-			return
-		end
-		local cameraPosition = camera.CFrame.Position
-		local now = os.clock()
-		for model, info in penDinos do
-			if not model.Parent then
-				penDinos[model] = nil
-				continue
-			end
-			if (info.home.Position - cameraPosition).Magnitude > ANIMATE_DISTANCE then
-				continue
-			end
-			local t = now + info.seed
-			local stage = model:GetAttribute("Stage") or 3
-			local offset
-			if stage == 1 then
-				-- Babies trot around their spot in a lazy figure of eight and hop.
-				local x, z = math.sin(t * 0.7) * 2.6, math.sin(t * 1.4) * 1.3
-				local heading = math.atan2(-math.cos(t * 0.7) * 0.7 * 2.6, -math.cos(t * 1.4) * 1.4 * 1.3)
-				local hop = math.abs(math.sin(t * 5)) * 0.35
-				offset = CFrame.new(x, hop, z) * CFrame.Angles(0, heading, 0)
-			else
-				-- Bigger ones breathe, sway and look around.
-				local breathe = math.sin(t * 1.6) * 0.07
-				offset = CFrame.new(0, breathe + 0.07, 0)
-					* CFrame.Angles(math.sin(t * 1.6) * 0.025, math.sin(t * 0.45) * 0.35, math.sin(t * 0.9) * 0.02)
-			end
-			model:PivotTo(info.home * offset)
-		end
-	end)
+function Effects.shake(power: number, seconds: number)
+	shakePower = math.max(power, if os.clock() < shakeUntil then shakePower else 0)
+	shakeUntil = math.max(shakeUntil, os.clock() + seconds)
 end
 
----------------------------------------------------------------------------
--- Sounds (all from Roblox's built-in sound folder, so they always load)
----------------------------------------------------------------------------
-
+-- Sounds from Roblox's built-in folder, so they always load.
 local SOUNDS = {
 	grab = { id = "rbxasset://sounds/electronicpingshort.wav", volume = 0.6, speed = 1.3 },
 	hatch = { id = "rbxasset://sounds/victory.wav", volume = 0.5, speed = 1.15 },
 	coin = { id = "rbxasset://sounds/electronicpingshort.wav", volume = 0.5, speed = 1.8 },
 	error = { id = "rbxasset://sounds/bass.wav", volume = 0.5, speed = 0.8 },
-	swing = { id = "rbxasset://sounds/swordslash.wav", volume = 0.5, speed = 1 },
 	hurt = { id = "rbxasset://sounds/collide.wav", volume = 0.8, speed = 0.9 },
-	ability = { id = "rbxasset://sounds/swordlunge.wav", volume = 0.6, speed = 0.8 },
+	dash = { id = "rbxasset://sounds/swordlunge.wav", volume = 0.5, speed = 1.2 },
+	alert = { id = "rbxasset://sounds/bass.wav", volume = 0.9, speed = 0.5 },
 	success = { id = "rbxasset://sounds/switch.wav", volume = 0.5, speed = 1.2 },
+	train = { id = "rbxasset://sounds/switch.wav", volume = 0.4, speed = 0.8 },
 }
 local soundCache: { [string]: Sound } = {}
 
@@ -398,9 +366,9 @@ end
 
 -- Picks a sound for a server notification.
 function Effects.notifySound(message: string, kind: string?)
-	if string.find(message, "hatched", 1, true) then
+	if string.find(message, "Hatched", 1, true) then
 		Effects.sound("hatch")
-	elseif string.find(message, "Got a", 1, true) or string.find(message, "Egg placed", 1, true) then
+	elseif string.find(message, "Got a", 1, true) or string.find(message, "incubator!", 1, true) then
 		Effects.sound("grab")
 	elseif kind == "coin" then
 		Effects.sound("coin")
@@ -412,11 +380,18 @@ function Effects.notifySound(message: string, kind: string?)
 end
 
 function Effects.start()
-	startPenDinos()
-	startRainbow()
+	startDepth()
+	startLife()
 	startNestTimers()
-	startEggFlights()
-	startCameraShake()
+	startTreadmill()
+	RunService:BindToRenderStep("SeaCameraShake", Enum.RenderPriority.Camera.Value + 1, function()
+		local left = shakeUntil - os.clock()
+		local camera = workspace.CurrentCamera
+		if left > 0 and camera then
+			local strength = shakePower * math.min(left, 1)
+			camera.CFrame *= CFrame.new((math.random() - 0.5) * strength, (math.random() - 0.5) * strength, 0)
+		end
+	end)
 end
 
 return Effects

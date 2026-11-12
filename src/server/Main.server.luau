@@ -1,57 +1,39 @@
 -- Main.server.luau
--- Server entry point for Dino Raiders. Creates the RemoteEvents and starts
--- every service. All game logic that matters (money, eggs, dinosaurs,
--- damage, saving) runs on the server; clients can only send requests that
--- the services validate.
+-- Server entry point of "Steal a Sea Monster". Everything that matters
+-- (money, eggs, creatures, speed, saving) is decided here on the server;
+-- clients only send requests that the services validate.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Config = require(ReplicatedStorage.Shared.Config)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 
--- Remotes must exist before any service or client uses them.
-Remotes.createAll()
+Remotes.createAll() -- must exist before any service or client uses them
 
 local Services = script.Parent.Services
-
--- Build the real terrain first: bases and eggs need the final ground.
-require(Services.Terraform).run()
 local PlayerData = require(Services.PlayerData)
-local Leaderboard = require(Services.Leaderboard)
 local Bases = require(Services.Bases)
-local Mounts = require(Services.Mounts)
-local Eggs = require(Services.Eggs)
-local Combat = require(Services.Combat)
-local Shop = require(Services.Shop)
-local DevTools = require(Services.DevTools)
+local Ocean = require(Services.Ocean)
+local Trails = require(Services.Trails)
+local Movement = require(script.Parent.Lib.Movement)
 local RateLimiter = require(script.Parent.Lib.RateLimiter)
 
--- Map and gameplay services first, PlayerData last so every
--- ProfileLoaded listener is connected before the first player loads.
+Movement.setSpeedSource(function(player)
+	local data = PlayerData.get(player)
+	return data and data.Speed
+end)
+
+-- PlayerData last, so every ProfileLoaded listener is connected first.
 Bases.start()
-Mounts.start()
-Eggs.start()
-Combat.start()
-Shop.start()
-Leaderboard.start()
+Ocean.start()
+Trails.start()
 PlayerData.start()
-DevTools.start() -- Studio-only test commands
 
--- The client asks for its state once its UI is ready.
-local syncLimiter = RateLimiter.new(Config.SyncCooldown)
+local syncLimiter = RateLimiter.new(1)
 Remotes.get("RequestSync").OnServerEvent:Connect(function(player)
-	if not syncLimiter:check(player) then
-		return
+	if syncLimiter:check(player) then
+		PlayerData.changed(player)
 	end
-	if PlayerData.get(player) then
-		Bases.refresh(player)
-	end
-	Leaderboard.sendTo(player)
 end)
 
-Players.PlayerRemoving:Connect(function(player)
-	syncLimiter:forget(player)
-end)
-
-print("[Main] Dino Raiders server started")
+print("[Main] Steal a Sea Monster server started (" .. #Players:GetPlayers() .. " players)")

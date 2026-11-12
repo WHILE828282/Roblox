@@ -1,14 +1,11 @@
 -- Panels.luau
--- Pop-up windows opened from the menu: Dinos, Upgrades, Shop and Odds.
--- Contents are rebuilt from the latest server data whenever it changes.
+-- Pop-up windows: Trails (the trail shop), Shop (upgrades and selling
+-- creatures) and Index (every creature you have discovered).
 
-local MarketplaceService = game:GetService("MarketplaceService")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
-local Dinos = require(ReplicatedStorage.Shared.Dinos)
-local Economy = require(ReplicatedStorage.Shared.Economy)
+local Sea = require(ReplicatedStorage.Shared.Sea)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Create = require(script.Parent.Create)
 local Theme = require(script.Parent.Theme)
@@ -17,38 +14,8 @@ local Style = require(script.Parent.Style)
 local Panels = {}
 Panels.__index = Panels
 
-local player = Players.LocalPlayer
-
--- What each Robux item does, shown in the Shop.
-local SHOP_ITEMS = {
-	{ kind = "pass", key = "DoubleMoney", name = "x2 Money", description = "All your dinosaurs earn twice as much" },
-	{ kind = "pass", key = "DoubleGrowth", name = "x2 Growth", description = "Dinosaurs grow up twice as fast" },
-	{ kind = "pass", key = "ExtraNests", name = "+3 Nests", description = "Hatch more eggs at once" },
-	{
-		kind = "pass",
-		key = "SaddleLock",
-		name = "Saddle Lock",
-		description = "If you die, only you can saddle your dinosaur for 5 min",
-	},
-	{ kind = "product", key = "InstantHatch", name = "Instant Hatch", description = "Hatch your next egg right now" },
-	{ kind = "product", key = "HatchAll", name = "Hatch All", description = "Hatch every egg in your nests" },
-	{
-		kind = "product",
-		key = "ServerLuck",
-		name = "Server Luck",
-		description = "Rarer eggs for EVERYONE for 10 minutes",
-	},
-	{
-		kind = "product",
-		key = "BigEruption",
-		name = "Big Eruption",
-		description = "Wake the volcano: big eruption in 15 s",
-	},
-	{ kind = "product", key = "CashSmall", name = "Cash Pack", description = "10 minutes of your income" },
-	{ kind = "product", key = "CashLarge", name = "Big Cash Pack", description = "2 hours of your income" },
-}
-
-local priceCache: { [string]: string } = {}
+local OUTLINE = Color3.fromRGB(12, 14, 22)
+local TITLES = { Trails = "Trail Shop", Shop = "Shop", Index = "Sea Index" }
 
 local function corner(): UICorner
 	return Create("UICorner", { CornerRadius = Theme.Corner })
@@ -71,13 +38,7 @@ local function text(parent: Instance, props)
 end
 
 local function smallButton(parent: Instance, props, onClick)
-	local defaults = {
-		BackgroundColor3 = Theme.Accent,
-		Font = Theme.BoldFont,
-		TextColor3 = Theme.Text,
-		TextSize = 14,
-		Parent = parent,
-	}
+	local defaults = { BackgroundColor3 = Theme.Success, Font = Theme.BoldFont, TextColor3 = Theme.Text, TextSize = 15, Parent = parent }
 	for key, value in props do
 		defaults[key] = value
 	end
@@ -87,60 +48,51 @@ local function smallButton(parent: Instance, props, onClick)
 	return instance
 end
 
--- A row frame inside the list.
-local function row(list: Instance, order: number, height: number?)
+local function row(list: Instance, order: number, height: number)
 	return Create("Frame", {
-		Size = UDim2.new(1, -6, 0, height or 56),
+		Size = UDim2.new(1, -8, 0, height),
 		BackgroundColor3 = Theme.Panel,
 		LayoutOrder = order,
 		Parent = list,
-	}, { corner() })
+	}, { corner(), Create("UIStroke", { Color = OUTLINE, Thickness = 2 }) })
 end
 
--- actions = { sell(id), ride(id), buyUpgrade(id) }
+-- actions = { buyTrail(id), equipTrail(id), upgradeTreadmill(), upgradeAquarium(), sell(id) }
 function Panels.new(screenGui: ScreenGui, actions)
 	local self = setmetatable({}, Panels)
 	self.actions = actions
 	self.current = nil
 	self.state = nil
-	self.dinos = {}
-	self.eggs = {}
 
 	self.frame = Create("Frame", {
 		Name = "Panel",
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.52),
-		Size = UDim2.new(0, 440, 0.7, 0),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(0.92, 0, 0.72, 0),
 		BackgroundColor3 = Theme.Background,
 		Visible = false,
+		ZIndex = 3,
 		Parent = screenGui,
 	}, {
 		corner(),
-		Create("UIStroke", { Color = Color3.fromRGB(12, 14, 22), Thickness = 3 }),
-		Create("UIGradient", {
-			Rotation = 90,
-			Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.fromRGB(170, 175, 205)),
-		}),
-		Create("UISizeConstraint", { MaxSize = Vector2.new(440, 560) }),
+		Create("UIStroke", { Color = OUTLINE, Thickness = 3 }),
+		Create("UIGradient", { Rotation = 90, Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.fromRGB(170, 178, 215)) }),
+		Create("UISizeConstraint", { MaxSize = Vector2.new(470, 560) }),
 	})
-	self.title = text(self.frame, {
-		Position = UDim2.new(0, 14, 0, 8),
-		Size = UDim2.new(1, -60, 0, 32),
-		Font = Theme.BoldFont,
-		TextSize = 22,
-	})
+	self.title = text(self.frame, { Position = UDim2.new(0, 16, 0, 8), Size = UDim2.new(1, -70, 0, 36), Font = Theme.BoldFont, TextSize = 26 })
+	Style.text(self.title, 2)
 	smallButton(self.frame, {
 		AnchorPoint = Vector2.new(1, 0),
 		Position = UDim2.new(1, -8, 0, 8),
-		Size = UDim2.new(0, 34, 0, 34),
+		Size = UDim2.fromOffset(38, 38),
 		Text = "X",
 		BackgroundColor3 = Theme.Error,
 	}, function()
 		self:close()
 	end)
 	self.list = Create("ScrollingFrame", {
-		Position = UDim2.new(0, 10, 0, 48),
-		Size = UDim2.new(1, -20, 1, -58),
+		Position = UDim2.new(0, 10, 0, 52),
+		Size = UDim2.new(1, -20, 1, -62),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 6,
@@ -148,20 +100,21 @@ function Panels.new(screenGui: ScreenGui, actions)
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		Parent = self.frame,
 	}, {
-		Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }),
+		Create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }),
+		Create("UIPadding", { PaddingTop = UDim.new(0, 3), PaddingLeft = UDim.new(0, 3) }),
 	})
 	return self
 end
 
-function Panels:open(name: string)
-	if self.current == name then
+function Panels:open(name: string, keepOpen: boolean?)
+	if self.current == name and not keepOpen then
 		self:close()
 		return
 	end
 	self.current = name
 	self.frame.Visible = true
-	Style.popIn(self.frame)
 	self.list.CanvasPosition = Vector2.zero
+	Style.popIn(self.frame)
 	self:refresh()
 end
 
@@ -171,18 +124,31 @@ function Panels:close()
 end
 
 function Panels:setState(state)
+	local old = self.state
 	self.state = state
-	if self.current then
+	-- Rebuild only when something shown in the open window changed.
+	if self.current and (not old or self:signature(old) ~= self:signature(state)) then
 		self:refresh()
 	end
 end
 
-function Panels:setBase(dinos, eggs)
-	self.dinos = dinos or {}
-	self.eggs = eggs or {}
-	if self.current then
-		self:refresh()
+function Panels:signature(state): string
+	local parts = { self.current, math.floor(state.money or 0) }
+	if self.current == "Trails" then
+		table.insert(parts, #(state.trails or {}))
+		table.insert(parts, tostring(state.trail))
+	elseif self.current == "Shop" then
+		table.insert(parts, state.treadmill)
+		table.insert(parts, state.aquarium)
+		table.insert(parts, #(state.creatures or {}))
+	else
+		local count = 0
+		for _ in state.index or {} do
+			count += 1
+		end
+		parts = { self.current, count }
 	end
+	return table.concat(parts, "|")
 end
 
 function Panels:refresh()
@@ -191,262 +157,202 @@ function Panels:refresh()
 			child:Destroy()
 		end
 	end
-	self.title.Text = self.current or ""
+	self.title.Text = TITLES[self.current] or ""
 	if not self.state then
 		return
 	end
-	if self.current == "Dinos" then
-		self:buildDinos()
-	elseif self.current == "Upgrades" then
-		self:buildUpgrades()
+	if self.current == "Trails" then
+		self:buildTrails()
 	elseif self.current == "Shop" then
 		self:buildShop()
-	elseif self.current == "Odds" then
-		self:buildOdds()
+	elseif self.current == "Index" then
+		self:buildIndex()
 	end
 end
 
-function Panels:buildDinos()
+function Panels:buildTrails()
 	local state = self.state
-	local order = 0
-	local now = workspace:GetServerTimeNow()
-
-	if #self.eggs > 0 then
-		order += 1
-		text(
-			self.list,
-			{ Text = "Eggs in your nests", Font = Theme.BoldFont, Size = UDim2.new(1, 0, 0, 22), LayoutOrder = order }
-		)
-		for _, egg in self.eggs do
-			order += 1
-			local left = egg.hatchAt - now
-			local tier = Dinos.TierById[egg.t]
-			text(self.list, {
-				Text = Dinos.displayName(egg.s, egg.t, egg.m) .. " egg - " .. (if left > 0
-					then "hatches in " .. Format.duration(left)
-					else "ready (pen full?)"),
-				TextColor3 = tier.color,
-				Size = UDim2.new(1, 0, 0, 20),
-				LayoutOrder = order,
-			})
-		end
-	end
-
-	order += 1
 	text(self.list, {
-		Text = string.format("Your dinosaurs (%d/%d)", #self.dinos, state.penSize or 0),
-		Font = Theme.BoldFont,
-		Size = UDim2.new(1, 0, 0, 24),
-		LayoutOrder = order,
+		Text = "Trails glow behind you and make the treadmill train Speed faster.",
+		TextColor3 = Theme.MutedText,
+		Size = UDim2.new(1, -8, 0, 36),
+		LayoutOrder = 0,
 	})
-	if #self.dinos == 0 then
-		order += 1
-		text(self.list, {
-			Text = "No dinosaurs yet! Grab eggs that fly out of the volcano and bring them to your nests.",
-			TextColor3 = Theme.MutedText,
-			Size = UDim2.new(1, 0, 0, 40),
-			LayoutOrder = order,
+	for order, trail in Sea.Trails do
+		local owned = table.find(state.trails or {}, trail.id) ~= nil
+		local equipped = state.trail == trail.id
+		local item = row(self.list, order, 66)
+		-- Preview stripe in the trail's colors.
+		Create("Frame", {
+			Position = UDim2.new(0, 10, 0.5, -22),
+			Size = UDim2.fromOffset(44, 44),
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			Parent = item,
+		}, {
+			corner(),
+			Create("UIStroke", { Color = OUTLINE, Thickness = 2 }),
+			Create("UIGradient", { Rotation = 45, Color = ColorSequence.new(trail.colors[1], trail.colors[2]) }),
 		})
-		return
-	end
-
-	local sorted = table.clone(self.dinos)
-	table.sort(sorted, function(a, b)
-		return Economy.dinoIncome(a) > Economy.dinoIncome(b)
-	end)
-	local busy = state.riding ~= nil or state.mountOut
-	for _, dino in sorted do
-		order += 1
-		local item = row(self.list, order, 62)
-		local tier = Dinos.TierById[dino.t]
-		local stage = Economy.stage(dino.t, dino.g)
-		local stageText = Dinos.Stages[stage].id
-		if stage < 3 then
-			local step = if state.passes and state.passes.DoubleGrowth then 2 else 1
-			stageText ..= " - grows in " .. Format.duration(Economy.growthLeft(dino.t, dino.g) / step)
-		end
+		text(item, { Position = UDim2.new(0, 64, 0, 8), Size = UDim2.new(1, -200, 0, 24), Font = Theme.BoldFont, TextSize = 19, Text = trail.name })
 		text(item, {
-			Position = UDim2.new(0, 10, 0, 4),
-			Size = UDim2.new(1, -170, 0, 22),
-			Font = Theme.BoldFont,
-			TextColor3 = tier.color,
-			TextTruncate = Enum.TextTruncate.AtEnd,
-			Text = Dinos.displayName(dino.s, dino.t, dino.m),
+			Position = UDim2.new(0, 64, 0, 34),
+			Size = UDim2.new(1, -200, 0, 22),
+			TextColor3 = Theme.Gold,
+			Text = "Treadmill x" .. trail.multiplier,
 		})
-		text(item, {
-			Position = UDim2.new(0, 10, 0, 28),
-			Size = UDim2.new(1, -170, 0, 30),
-			TextSize = 13,
-			TextColor3 = Theme.MutedText,
-			Text = stageText .. "\n" .. Format.money(Economy.dinoIncome(dino)) .. "/s",
-		})
-		local canRide = stage == 3 and not busy
+		local affordable = (state.money or 0) >= trail.price
 		smallButton(item, {
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -90, 0.5, 0),
-			Size = UDim2.new(0, 70, 0, 36),
-			Text = "Ride",
-			BackgroundColor3 = if canRide then Theme.Success else Theme.Panel,
-			TextColor3 = if canRide then Theme.Text else Theme.MutedText,
+			Position = UDim2.new(1, -10, 0.5, 0),
+			Size = UDim2.fromOffset(118, 44),
+			Text = if equipped then "EQUIPPED" elseif owned then "EQUIP" else Format.money(trail.price),
+			BackgroundColor3 = if equipped then Theme.Accent elseif owned or affordable then Theme.Success else Theme.Panel,
 		}, function()
-			if canRide then
-				self.actions.ride(dino.id)
-				self:close()
-			end
-		end)
-		smallButton(item, {
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -8, 0.5, 0),
-			Size = UDim2.new(0, 76, 0, 36),
-			Text = "Sell " .. Format.money(Economy.sellPrice(dino)),
-			TextScaled = true,
-			BackgroundColor3 = Theme.Error,
-		}, function()
-			self.actions.sell(dino.id)
-		end)
-	end
-end
-
-function Panels:buildUpgrades()
-	local state = self.state
-	for order, upgradeId in Economy.UpgradeOrder do
-		local upgrade = Economy.Upgrades[upgradeId]
-		local level = state.upgrades and state.upgrades[upgradeId] or 0
-		local cost = Economy.upgradeCost(upgradeId, level)
-		local item = row(self.list, order, 64)
-		text(item, {
-			Position = UDim2.new(0, 10, 0, 4),
-			Size = UDim2.new(1, -130, 0, 24),
-			Font = Theme.BoldFont,
-			Text = string.format("%s  (Lv %d/%d)", upgrade.name, level, upgrade.maxLevel),
-		})
-		text(item, {
-			Position = UDim2.new(0, 10, 0, 30),
-			Size = UDim2.new(1, -130, 0, 28),
-			TextSize = 13,
-			TextColor3 = Theme.MutedText,
-			Text = upgrade.description,
-		})
-		local affordable = cost ~= nil and (state.money or 0) >= cost
-		smallButton(item, {
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -8, 0.5, 0),
-			Size = UDim2.new(0, 110, 0, 40),
-			Text = if cost then Format.money(cost) else "MAX",
-			BackgroundColor3 = if affordable then Theme.Success else Theme.Panel,
-		}, function()
-			if cost then
-				self.actions.buyUpgrade(upgradeId)
+			if owned then
+				self.actions.equipTrail(trail.id)
+			else
+				self.actions.buyTrail(trail.id)
 			end
 		end)
 	end
-end
-
-local function loadPrice(kind: string, id: number, onLoaded: () -> ())
-	local key = kind .. id
-	if priceCache[key] then
-		return
-	end
-	priceCache[key] = "..."
-	task.spawn(function()
-		local ok, info = pcall(function()
-			return MarketplaceService:GetProductInfo(
-				id,
-				if kind == "pass" then Enum.InfoType.GamePass else Enum.InfoType.Product
-			)
-		end)
-		priceCache[key] = if ok and info and info.PriceInRobux then "R$ " .. info.PriceInRobux else "Buy"
-		onLoaded()
-	end)
 end
 
 function Panels:buildShop()
-	local passes = self.state.passes or {}
-	for order, entry in SHOP_ITEMS do
-		local id = if entry.kind == "pass" then Config.GamePasses[entry.key] else Config.Products[entry.key]
-		local owned = entry.kind == "pass" and passes[entry.key]
-		local item = row(self.list, order, 60)
+	local state = self.state
+	local upgrades = {
+		{
+			name = "Treadmill",
+			level = state.treadmill or 0,
+			max = Config.TreadmillMaxLevel,
+			cost = Config.treadmillCost(state.treadmill or 0),
+			info = string.format("+%.2f Speed per second", Config.treadmillRate(state.treadmill or 0) * Sea.trailMultiplier(state.trail)),
+			action = self.actions.upgradeTreadmill,
+		},
+		{
+			name = "Aquarium",
+			level = state.aquarium or 0,
+			max = Config.AquariumMaxLevel,
+			cost = Config.aquariumCost(state.aquarium or 0),
+			info = "Holds " .. Config.aquariumSize(state.aquarium or 0) .. " creatures",
+			action = self.actions.upgradeAquarium,
+		},
+	}
+	for order, upgrade in upgrades do
+		local item = row(self.list, order, 66)
 		text(item, {
-			Position = UDim2.new(0, 10, 0, 4),
-			Size = UDim2.new(1, -120, 0, 22),
+			Position = UDim2.new(0, 12, 0, 8),
+			Size = UDim2.new(1, -150, 0, 24),
 			Font = Theme.BoldFont,
-			TextColor3 = if entry.kind == "pass" then Theme.Gold else Theme.Text,
-			Text = entry.name,
+			TextSize = 19,
+			Text = string.format("%s  Lv %d/%d", upgrade.name, upgrade.level, upgrade.max),
 		})
-		text(item, {
-			Position = UDim2.new(0, 10, 0, 28),
-			Size = UDim2.new(1, -120, 0, 28),
-			TextSize = 13,
-			TextColor3 = Theme.MutedText,
-			Text = entry.description,
-		})
-		local label
-		if owned then
-			label = "Owned"
-		elseif id == 0 then
-			label = "Coming soon"
-		else
-			loadPrice(entry.kind, id, function()
-				if self.current == "Shop" then
-					self:refresh()
-				end
-			end)
-			label = priceCache[entry.kind .. id] or "Buy"
-		end
+		text(item, { Position = UDim2.new(0, 12, 0, 34), Size = UDim2.new(1, -150, 0, 22), TextColor3 = Theme.MutedText, Text = upgrade.info })
+		local affordable = upgrade.cost ~= nil and (state.money or 0) >= upgrade.cost
 		smallButton(item, {
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -8, 0.5, 0),
-			Size = UDim2.new(0, 100, 0, 38),
-			Text = label,
-			BackgroundColor3 = if owned or id == 0 then Theme.Panel else Theme.Success,
+			Position = UDim2.new(1, -10, 0.5, 0),
+			Size = UDim2.fromOffset(118, 44),
+			Text = if upgrade.cost then Format.money(upgrade.cost) else "MAX",
+			BackgroundColor3 = if affordable then Theme.Success else Theme.Panel,
+		}, upgrade.action)
+	end
+
+	local creatures = state.creatures or {}
+	text(self.list, {
+		Text = string.format("Your aquarium (%d/%d)", #creatures, state.aquariumSize or 0),
+		Font = Theme.BoldFont,
+		TextSize = 18,
+		Size = UDim2.new(1, -8, 0, 28),
+		LayoutOrder = 10,
+	})
+	if #creatures == 0 then
+		text(self.list, {
+			Text = "Empty! Dive into the ocean, steal an egg and bring it to your base.",
+			TextColor3 = Theme.MutedText,
+			Size = UDim2.new(1, -8, 0, 40),
+			LayoutOrder = 11,
+		})
+	end
+	local sorted = table.clone(creatures)
+	table.sort(sorted, function(a, b)
+		return Sea.Creatures[a.c].income > Sea.Creatures[b.c].income
+	end)
+	for order, entry in sorted do
+		local creature = Sea.Creatures[entry.c]
+		local item = row(self.list, 20 + order, 52)
+		text(item, {
+			Position = UDim2.new(0, 12, 0, 4),
+			Size = UDim2.new(1, -150, 0, 24),
+			Font = Theme.BoldFont,
+			TextSize = 17,
+			TextColor3 = Sea.RarityById[creature.rarity].color,
+			Text = creature.name,
+		})
+		text(item, {
+			Position = UDim2.new(0, 12, 0, 27),
+			Size = UDim2.new(1, -150, 0, 20),
+			TextSize = 13,
+			TextColor3 = Theme.MutedText,
+			Text = creature.rarity .. "  -  " .. Format.money(creature.income) .. "/s",
+		})
+		smallButton(item, {
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, -10, 0.5, 0),
+			Size = UDim2.fromOffset(118, 36),
+			Text = "SELL " .. Format.money(creature.income * Config.SellSeconds),
+			TextSize = 13,
+			BackgroundColor3 = Theme.Error,
 		}, function()
-			if owned or id == 0 then
-				return
-			end
-			if entry.kind == "pass" then
-				MarketplaceService:PromptGamePassPurchase(player, id)
-			else
-				MarketplaceService:PromptProductPurchase(player, id)
-			end
+			self.actions.sell(entry.id)
 		end)
 	end
 end
 
--- Exact chances, as required by Roblox rules for paid random items.
-function Panels:buildOdds()
-	local luck = if (self.state.serverLuckLeft or 0) > 0 then Config.ServerLuckMultiplier else 1
+function Panels:buildIndex()
+	local index = self.state.index or {}
 	local order = 0
-	local function line(value: string, color: Color3?, bold: boolean?)
+	for zoneIndex, zone in Sea.Zones do
 		order += 1
 		text(self.list, {
-			Text = value,
-			TextColor3 = color or Theme.Text,
-			Font = if bold then Theme.BoldFont else Theme.Font,
-			Size = UDim2.new(1, 0, 0, 20),
+			Text = string.format("-%dm  %s   (speed %d+)", zone.depth, zone.name, zone.speed),
+			Font = Theme.BoldFont,
+			TextSize = 18,
+			TextColor3 = zone.glow,
+			Size = UDim2.new(1, -8, 0, 28),
 			LayoutOrder = order,
 		})
-	end
-	line(
-		"Eggs closer to the volcano are rarer." .. (if luck > 1 then " Server luck is ON (x2)." else ""),
-		Theme.MutedText
-	)
-	local ringNames = {
-		Outer = "Outer ring (far from the volcano)",
-		Middle = "Middle ring",
-		Inner = "Inner ring (next to the volcano)",
-		Big = "Big eruption special egg",
-	}
-	for _, ring in Dinos.RingOrder do
-		line(ringNames[ring], Theme.Gold, true)
-		for _, entry in Dinos.tierOdds(ring, luck) do
-			line("   " .. entry.id .. ": " .. Format.percent(entry.chance), Dinos.TierById[entry.id].color)
+		for _, id in Sea.CreatureOrder do
+			local creature = Sea.Creatures[id]
+			if creature.zone == zoneIndex then
+				order += 1
+				local found = index[id] == true
+				local rarity = Sea.RarityById[creature.rarity]
+				local item = row(self.list, order, 46)
+				Create("Frame", {
+					Position = UDim2.new(0, 10, 0.5, -14),
+					Size = UDim2.fromOffset(28, 28),
+					BackgroundColor3 = if found then creature.color else Color3.fromRGB(30, 32, 50),
+					Parent = item,
+				}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }), Create("UIStroke", { Color = OUTLINE, Thickness = 2 }) })
+				text(item, {
+					Position = UDim2.new(0, 48, 0, 0),
+					Size = UDim2.new(0.5, -48, 1, 0),
+					Font = Theme.BoldFont,
+					TextSize = 17,
+					TextColor3 = if found then rarity.color else Theme.MutedText,
+					Text = if found then creature.name else "???",
+				})
+				text(item, {
+					Position = UDim2.new(0.5, 0, 0, 0),
+					Size = UDim2.new(0.5, -10, 1, 0),
+					TextSize = 13,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					TextColor3 = Theme.MutedText,
+					Text = string.format("%s  %s  %s/s", rarity.id, Format.percent(Sea.chance(id)), Format.money(creature.income)),
+				})
+			end
 		end
 	end
-	line("Mutations (any egg)", Theme.Gold, true)
-	for _, entry in Dinos.mutationOdds(luck) do
-		line("   " .. entry.id .. ": " .. Format.percent(entry.chance))
-	end
-	line("Species: each of the " .. #Dinos.SpeciesOrder .. " species has an equal chance.", Theme.MutedText)
 end
 
 return Panels
