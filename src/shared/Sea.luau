@@ -7,11 +7,11 @@ local rgb = Color3.fromRGB
 
 -- weight: walk speed multiplier while carrying the egg (rarer = heavier).
 Sea.Rarities = {
-	{ id = "Common", weight = 0.85, hatch = 15, color = rgb(210, 214, 222) },
-	{ id = "Uncommon", weight = 0.76, hatch = 30, color = rgb(96, 220, 110) },
-	{ id = "Rare", weight = 0.67, hatch = 60, color = rgb(70, 160, 255) },
-	{ id = "Epic", weight = 0.58, hatch = 120, color = rgb(190, 100, 255) },
-	{ id = "Legendary", weight = 0.5, hatch = 240, color = rgb(255, 190, 40) },
+	{ id = "Common", weight = 0.92, hatch = 15, color = rgb(210, 214, 222) },
+	{ id = "Uncommon", weight = 0.82, hatch = 30, color = rgb(96, 220, 110) },
+	{ id = "Rare", weight = 0.72, hatch = 60, color = rgb(70, 160, 255) },
+	{ id = "Epic", weight = 0.62, hatch = 120, color = rgb(190, 100, 255) },
+	{ id = "Legendary", weight = 0.52, hatch = 240, color = rgb(255, 190, 40) },
 	{ id = "Mythic", weight = 0.42, hatch = 480, color = rgb(255, 70, 110) },
 }
 Sea.RarityById = {}
@@ -20,18 +20,18 @@ for index, rarity in Sea.Rarities do
 	Sea.RarityById[rarity.id] = rarity
 end
 
--- Depth zones, from the surface down. speed = recommended run speed,
--- guardSpeed = how fast the guardian chases.
+-- Depth zones, from the surface down. speed = recommended run speed;
+-- the guardian runs at speed x Config.GuardSpeedFactor.
 Sea.Zones = {
-	{ name = "Coral Reef", depth = 50, speed = 16, guardSpeed = 15, guard = "Giant Crab",
+	{ name = "Coral Reef", depth = 50, speed = 14, guard = "Giant Crab",
 		water = rgb(70, 200, 220), glow = rgb(255, 120, 170) },
-	{ name = "Sunken Fleet", depth = 150, speed = 30, guardSpeed = 27, guard = "Ghost Shark",
+	{ name = "Sunken Fleet", depth = 150, speed = 30, guard = "Ghost Shark",
 		water = rgb(40, 130, 190), glow = rgb(120, 255, 220) },
-	{ name = "Ruins of Atlantis", depth = 300, speed = 50, guardSpeed = 45, guard = "Stone Titan",
+	{ name = "Ruins of Atlantis", depth = 300, speed = 55, guard = "Stone Titan",
 		water = rgb(28, 84, 160), glow = rgb(90, 200, 255) },
-	{ name = "Jellyfish Cave", depth = 500, speed = 80, guardSpeed = 72, guard = "Jelly Queen",
+	{ name = "Jellyfish Cave", depth = 500, speed = 90, guard = "Jelly Queen",
 		water = rgb(40, 34, 120), glow = rgb(210, 120, 255) },
-	{ name = "Mariana Abyss", depth = 1000, speed = 120, guardSpeed = 108, guard = "The Kraken",
+	{ name = "Mariana Abyss", depth = 1000, speed = 140, guard = "The Kraken",
 		water = rgb(8, 8, 30), glow = rgb(255, 60, 90) },
 }
 

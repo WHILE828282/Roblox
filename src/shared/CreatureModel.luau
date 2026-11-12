@@ -100,7 +100,7 @@ end
 function BUILDERS.jelly(model, s, c, a, mat)
 	local dome = shape(model, "Body", Vector3.new(2.8, 2.2, 2.8) * s, CFrame.new(0, 0.6 * s, 0), c, Enum.MeshType.Sphere, mat)
 	dome.Transparency = 0.2
-	shape(model, "Core", Vector3.new(1.5, 1.2, 1.5) * s, CFrame.new(0, 0.6 * s, 0), a, Enum.MeshType.Sphere, Enum.Material.Neon)
+	shape(model, "Core", Vector3.new(1.5, 1.2, 1.5) * s, CFrame.new(0, 0.6 * s, 0), a, Enum.MeshType.Sphere, mat)
 	for i = 1, 7 do
 		local angle = i * math.pi * 2 / 7
 		local length = (1.8 + (i % 3) * 0.5) * s
@@ -130,7 +130,7 @@ function CreatureModel.build(creatureId: string, scale: number?): Model
 	assert(creature, "Unknown creature: " .. tostring(creatureId))
 	local model = Instance.new("Model")
 	model.Name = creatureId
-	local material = if creature.glow then Enum.Material.Neon else Enum.Material.SmoothPlastic
+	local material = Enum.Material.SmoothPlastic
 	BUILDERS[creature.shape](model, scale or 1, creature.color, creature.accent, material)
 	finish(model, if creature.glow then creature.color else nil, 10)
 	model:SetAttribute("Creature", creatureId)
@@ -144,8 +144,7 @@ function CreatureModel.buildEgg(creatureId: string): Model
 	local size = 2.2 + rarity.index * 0.35
 	local model = Instance.new("Model")
 	model.Name = "Egg"
-	local shell = shape(model, "Body", Vector3.new(size, size * 1.3, size), CFrame.new(), rarity.color, Enum.MeshType.Sphere, Enum.Material.Neon)
-	shell.Transparency = 0.1
+	local shell = shape(model, "Body", Vector3.new(size, size * 1.3, size), CFrame.new(), rarity.color, Enum.MeshType.Sphere, Enum.Material.SmoothPlastic)
 	-- Spots in the color of the creature inside.
 	for i = 1, 5 do
 		local direction = CFrame.Angles(0, i * 1.3, 0) * CFrame.Angles(math.rad(-40 + i * 18), 0, 0)

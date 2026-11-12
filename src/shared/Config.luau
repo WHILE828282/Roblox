@@ -13,6 +13,7 @@ Config.Tags = {
 	GuardPost = "GuardPost", -- where a zone's guardian sleeps (attribute Zone)
 	DepthArch = "DepthArch", -- glowing arch at the start of a zone (attribute Zone)
 	TrailShop = "TrailShop", -- the stand on the pier
+	Treadmill = "Treadmill", -- a treadmill belt (attribute Active while someone trains)
 	-- Added by the server at runtime, used by client effects:
 	Guard = "Guard",
 	Sleeper = "Sleeper",
@@ -27,9 +28,9 @@ Config.AutosaveInterval = 120
 
 -- Map layout
 Config.OceanStartZ = 110 -- the pier (safe zone with the bases) ends here
-Config.ZoneLength = 100
-Config.CorridorHalfWidth = 35
-Config.Slope = 0.4 -- studs down per stud forward
+Config.ZoneLength = 375
+Config.CorridorHalfWidth = 60
+Config.Slope = 0.16 -- studs down per stud forward (only used by the generated test map)
 Config.BaseHalfWidth = 20 -- along the pier
 Config.BaseHalfDepth = 18 -- from the entrance to the back wall
 
@@ -62,7 +63,17 @@ Config.StealHoldTime = 2.5 -- stealing from another player's incubator
 -- Guardians
 Config.GuardCatchDistance = 9
 Config.GuardWakeDelay = 1.2 -- "!" time before the chase starts
-Config.GuardKnockback = 70
+Config.GuardWakeRadius = 90 -- a sleeping guardian wakes up when an egg carrier comes this close
+Config.GuardSpeedFactor = 0.95 -- guardian speed = zone's recommended speed x this
+Config.CaughtProtection = 3 -- seconds guardians ignore a player who was just caught
+
+-- Look (the client applies it; the depth effect changes it while diving)
+Config.Look = {
+	Exposure = -0.3,
+	BloomIntensity = 0.3,
+	BloomThreshold = 2,
+	BloomSize = 24,
+}
 
 -- Treadmill: speed gained per second = base + level * perLevel, times the trail multiplier.
 Config.TreadmillBase = 0.25

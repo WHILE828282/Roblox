@@ -3,7 +3,9 @@
 --   * Every zone has nests with eggs; deeper zones hold rarer, heavier eggs.
 --   * Grabbing an egg slows you down (rarer = heavier) and wakes the zone's
 --     guardian, which chases you until you reach the pier.
---   * If it catches you, the egg goes back to its nest and you are thrown back.
+--   * A sleeping guardian also wakes when an egg carrier comes close.
+--   * If it catches you, the egg goes back to its nest, you are sent home
+--     and guardians ignore you for a few seconds; the guardian goes back to sleep.
 --   * Reaching your own base puts the egg into a free incubator.
 -- Also: Dash and Drop Egg requests.
 
@@ -15,7 +17,7 @@ local RunService = game:GetService("RunService")
 local Config = require(ReplicatedStorage.Shared.Config)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local Sea = require(ReplicatedStorage.Shared.Sea)
-local CreatureModel = require(ReplicatedStorage.Shared.CreatureModel)
+local AssetModels = require(ReplicatedStorage.Shared.AssetModels)
 local PlayerData = require(script.Parent.PlayerData)
 local Bases = require(script.Parent.Bases)
 local Movement = require(script.Parent.Parent.Lib.Movement)
@@ -25,17 +27,17 @@ local Ocean = {}
 
 local random = Random.new()
 local alertRemote = Remotes.get("Alert")
-local knockbackRemote = Remotes.get("Knockback")
 local actionLimiter = RateLimiter.new(Config.ActionCooldown)
 
 -- nests[part] = { part, zone, model, creatureId }
 local nests = {}
 -- carried[player] = { creatureId, model, nest (nil for eggs stolen from players) }
 local carried: { [Player]: any } = {}
--- guards[zone] = { model, home (CFrame), state = "sleep" | "wake" | "chase" | "return", target, label, height }
+-- guards[zone] = { model, home (CFrame), state = "sleep" | "wake" | "chase" | "return", target, label }
 local guards = {}
 local dashReadyAt: { [Player]: number } = {}
 local fullWarned: { [Player]: number } = {}
+local safeUntil: { [Player]: number } = {} -- guardians ignore a player who was just caught
 
 local folder = Instance.new("Folder")
 folder.Name = "Ocean"
@@ -60,13 +62,29 @@ local function setGuardState(guard, state: string, target: Player?)
 	end
 end
 
+-- The top point of a part, also for rotated parts (nests are upright cylinders).
+local function topOf(part: BasePart): Vector3
+	local up = part.CFrame:VectorToObjectSpace(Vector3.yAxis)
+	local size = part.Size
+	local halfHeight = (math.abs(up.X) * size.X + math.abs(up.Y) * size.Y + math.abs(up.Z) * size.Z) / 2
+	return part.Position + Vector3.new(0, halfHeight, 0)
+end
+
+local function isSafe(player: Player): boolean
+	return (safeUntil[player] or 0) > os.clock()
+end
+
+local function guardSpeed(zone: number): number
+	return Sea.Zones[zone].speed * Config.GuardSpeedFactor
+end
+
 local function wakeGuard(zone: number, thief: Player)
 	local guard = guards[zone]
-	if not guard or guard.state == "chase" or guard.state == "wake" then
+	if not guard or guard.state == "chase" or guard.state == "wake" or isSafe(thief) then
 		return
 	end
 	setGuardState(guard, "wake", thief)
-	alertRemote:FireClient(thief, "THE " .. string.upper(Sea.Zones[zone].guard) .. " IS AWAKE! RUN TO YOUR BASE!")
+	alertRemote:FireClient(thief, "THE " .. string.upper(Sea.Zones[zone].guard) .. " WOKE UP! RUN TO YOUR BASE!")
 	task.delay(Config.GuardWakeDelay, function()
 		if guard.state == "wake" and guard.target == thief then
 			setGuardState(guard, "chase", thief)
@@ -82,39 +100,77 @@ local function calmGuards(player: Player)
 	end
 end
 
+-- The ground under a point: the map is built by hand, so we ask it with a ray.
+local groundParams = RaycastParams.new()
+groundParams.FilterType = Enum.RaycastFilterType.Exclude
+
+local function groundBelow(position: Vector3): number?
+	local ignore = { folder, workspace:FindFirstChild("Bases") }
+	for _, player in Players:GetPlayers() do
+		if player.Character then
+			table.insert(ignore, player.Character)
+		end
+	end
+	groundParams.FilterDescendantsInstances = ignore
+	local result = workspace:Raycast(position + Vector3.new(0, 40, 0), Vector3.new(0, -200, 0), groundParams)
+	return result and result.Position.Y
+end
+
+-- Moves a guardian towards `goal` along the ground. Returns the distance left.
 local function moveGuard(guard, goal: Vector3, speed: number, dt: number): number
 	local position = guard.model:GetPivot().Position
 	local flat = Vector3.new(goal.X - position.X, 0, goal.Z - position.Z)
 	local distance = flat.Magnitude
 	if distance > 0.05 then
 		local step = math.min(distance, speed * dt)
-		local nextXZ = position + flat.Unit * step
-		local z = math.max(nextXZ.Z, Config.OceanStartZ + 4)
-		local target = Vector3.new(nextXZ.X, Config.floorY(z) + guard.height, z)
+		local nextPosition = position + flat.Unit * step
+		-- Never leave the ocean: the pier is the safe zone.
+		nextPosition = Vector3.new(nextPosition.X, nextPosition.Y, math.max(nextPosition.Z, Config.OceanStartZ + 4))
+		local y = groundBelow(nextPosition) or position.Y
+		local target = Vector3.new(nextPosition.X, y, nextPosition.Z)
 		guard.model:PivotTo(CFrame.lookAt(target, target + flat.Unit))
 	end
 	return distance
 end
 
+-- The guardian caught the thief: no physics, just send them home safely.
+local function caught(guard, target: Player)
+	Ocean.drop(target) -- the egg goes back to its nest
+	safeUntil[target] = os.clock() + Config.CaughtProtection
+	local home = Bases.spawnCFrame(target)
+	if home and target.Character then
+		target.Character:PivotTo(home)
+	end
+	alertRemote:FireClient(target, "CAUGHT! The egg went back to its nest.")
+	guard.model:PivotTo(guard.home)
+	setGuardState(guard, "sleep", nil)
+end
+
 local function guardTick(dt: number)
 	for zone, guard in guards do
-		if guard.state == "chase" then
+		if guard.state == "sleep" then
+			-- Wake up when an egg carrier comes close.
+			local home = guard.home.Position
+			for player in carried do
+				local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				if rootPart and not isSafe(player) and (rootPart.Position - home).Magnitude <= Config.GuardWakeRadius then
+					wakeGuard(zone, player)
+					break
+				end
+			end
+		elseif guard.state == "chase" then
 			local target: Player? = guard.target
 			local targetRoot = target and target.Character and target.Character:FindFirstChild("HumanoidRootPart")
 			if not target or not targetRoot or not carried[target] or targetRoot.Position.Z < Config.OceanStartZ then
 				setGuardState(guard, "return", nil) -- the thief escaped to the pier (or lost the egg)
 			else
-				local distance = moveGuard(guard, targetRoot.Position, Sea.Zones[zone].guardSpeed, dt)
+				local distance = moveGuard(guard, targetRoot.Position, guardSpeed(zone), dt)
 				if distance <= Config.GuardCatchDistance then
-					local away = targetRoot.Position - guard.model:GetPivot().Position
-					away = Vector3.new(away.X, 0, away.Z - 0.01)
-					knockbackRemote:FireClient(target, away.Unit * Config.GuardKnockback + Vector3.new(0, 30, 0))
-					alertRemote:FireClient(target, "CAUGHT! The guardian took the egg back.")
-					Ocean.drop(target)
+					caught(guard, target)
 				end
 			end
 		elseif guard.state == "return" then
-			local distance = moveGuard(guard, guard.home.Position, Sea.Zones[zone].guardSpeed * 1.5, dt)
+			local distance = moveGuard(guard, guard.home.Position, guardSpeed(zone) * 1.5, dt)
 			if distance < 1 then
 				guard.model:PivotTo(guard.home)
 				setGuardState(guard, "sleep", nil)
@@ -128,17 +184,17 @@ local function setupGuard(post: BasePart)
 	if type(zone) ~= "number" or not Sea.Zones[zone] or guards[zone] then
 		return
 	end
-	local model = CreatureModel.buildGuard(zone)
-	local height = model:GetExtentsSize().Y / 2 + 0.5
-	local home = CFrame.lookAt(
-		Vector3.new(post.Position.X, Config.floorY(post.Position.Z) + height, post.Position.Z),
-		Vector3.new(0, Config.floorY(post.Position.Z) + height, post.Position.Z - 30)
-	)
+	local model = AssetModels.boss(zone)
+	local height = model:GetExtentsSize().Y
+	-- Sleep on the bed, facing the pier.
+	local bed = topOf(post)
+	local y = groundBelow(bed) or bed.Y
+	local home = CFrame.lookAt(Vector3.new(bed.X, y, bed.Z), Vector3.new(bed.X, y, bed.Z - 30))
 	model:PivotTo(home)
 	local gui = Instance.new("BillboardGui")
 	gui.Name = "Mood"
 	gui.Size = UDim2.fromOffset(200, 90)
-	gui.StudsOffset = Vector3.new(0, height + 5, 0)
+	gui.StudsOffset = Vector3.new(0, height + 4, 0)
 	gui.MaxDistance = 260
 	gui.Parent = model.PrimaryPart
 	local label = Instance.new("TextLabel")
@@ -151,7 +207,7 @@ local function setupGuard(post: BasePart)
 	label.Parent = gui
 	CollectionService:AddTag(model, Config.Tags.Guard)
 	model.Parent = folder
-	guards[zone] = { model = model, home = home, label = label, height = height, state = "sleep" }
+	guards[zone] = { model = model, home = home, label = label, state = "sleep" }
 	setGuardState(guards[zone], "sleep", nil)
 end
 
@@ -168,13 +224,13 @@ local function spawnEgg(nest, creatureId: string?)
 	creatureId = creatureId or Sea.rollCreature(nest.zone, random)
 	local creature = Sea.Creatures[creatureId]
 	local rarity = Sea.rarityOf(creatureId)
-	local model = CreatureModel.buildEgg(creatureId)
-	local size = model.PrimaryPart.Size
-	model:PivotTo(CFrame.new(nest.part.Position + Vector3.new(0, size.Y * 0.65 + 0.6, 0)))
+	local model = AssetModels.egg(creatureId)
+	local height = model:GetExtentsSize().Y
+	model:PivotTo(CFrame.new(topOf(nest.part)))
 
 	local gui = Instance.new("BillboardGui")
 	gui.Size = UDim2.fromOffset(190, 54)
-	gui.StudsOffset = Vector3.new(0, size.Y / 2 + 2, 0)
+	gui.StudsOffset = Vector3.new(0, height + 2, 0)
 	gui.MaxDistance = 110
 	gui.Parent = model.PrimaryPart
 	local label = Instance.new("TextLabel")
@@ -214,9 +270,9 @@ local function carry(player: Player, creatureId: string, nest): boolean
 	if not rootPart or carried[player] then
 		return false
 	end
-	local model = CreatureModel.buildEgg(creatureId)
-	CreatureModel.makeCarryable(model)
-	model:PivotTo(rootPart.CFrame * CFrame.new(0, 4.6, 0))
+	local model = AssetModels.egg(creatureId)
+	AssetModels.makeCarryable(model)
+	model:PivotTo(rootPart.CFrame * CFrame.new(0, 3.2, 0))
 	local weld = Instance.new("WeldConstraint")
 	weld.Part0 = rootPart
 	weld.Part1 = model.PrimaryPart
@@ -252,7 +308,7 @@ tryGrab = function(nest, player: Player, started: number?)
 	nest.model:Destroy()
 	nest.model = nil
 	if carry(player, creatureId, nest) then
-		wakeGuard(nest.zone, player)
+		wakeGuard(nest.zone, player) -- taking an egg always wakes the zone's guardian
 	end
 	task.delay(Config.NestRespawn, function()
 		spawnEgg(nest)
@@ -390,6 +446,7 @@ function Ocean.start()
 		Ocean.drop(player)
 		dashReadyAt[player] = nil
 		fullWarned[player] = nil
+		safeUntil[player] = nil
 	end)
 
 	Remotes.get("Dash").OnServerEvent:Connect(onDash)

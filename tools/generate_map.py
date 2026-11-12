@@ -28,9 +28,9 @@ import random
 random.seed(5)
 
 OCEAN_START = 110  # Config.OceanStartZ
-ZONE_LENGTH = 100  # Config.ZoneLength
-HALF_WIDTH = 35  # Config.CorridorHalfWidth
-SLOPE = 0.4  # Config.Slope
+ZONE_LENGTH = 375  # Config.ZoneLength
+HALF_WIDTH = 60  # Config.CorridorHalfWidth
+SLOPE = 0.16  # Config.Slope
 BASE_HALF_WIDTH = 20  # Config.BaseHalfWidth (along Z)
 BASE_HALF_DEPTH = 18  # Config.BaseHalfDepth (along X)
 BASE_X = 62
@@ -139,7 +139,7 @@ def build_pier():
     parts.append(part("Sand", (0, -3, mid), (PIER_HALF * 2, 6, length), (242, 222, 170), "Sand"))
     parts.append(part("Boardwalk", (0, 0.1, mid), (26, 0.3, length), (176, 128, 84), "WoodPlanks"))
     # The lagoon around the pier and the water surface above the dive.
-    parts.append(decor("Lagoon", (0, -1.4, 250), (1400, 0.6, 1500), (60, 190, 220), "Glass", Transparency=0.35,
+    parts.append(decor("Lagoon", (0, -1.4, 900), (1600, 0.6, 2400), (60, 190, 220), "Glass", Transparency=0.35,
                        Reflectance=0.15))
     parts.append(part("SeaBed", (0, -9, -200), (1400, 4, 600), (230, 214, 170), "Sand"))
     # Low stone border and invisible walls so nobody falls off the pier.
@@ -182,7 +182,7 @@ def build_pier():
         parts.append(part("Crate", (x, s / 2, z), (s, s, s), (190, 140, 90), "WoodPlanks",
                           orientation=yaw(random.uniform(0, 1.5))))
 
-    spawn = part("Spawn", (0, 0.4, -26), (12, 0.6, 12), (120, 210, 230), "Neon", class_name="SpawnLocation",
+    spawn = part("Spawn", (0, 0.4, -26), (12, 0.6, 12), (120, 210, 230), "SmoothPlastic", class_name="SpawnLocation",
                  Neutral=True, Duration=0, orientation=yaw(math.pi), Transparency=0.5)
     return parts + [spawn]
 
@@ -197,7 +197,7 @@ def build_bases():
             parts.append(part("BaseFloor", (x, 0.1, z), (BASE_HALF_DEPTH * 2, 0.4, BASE_HALF_WIDTH * 2),
                               (250, 240, 214), "Marble"))
             parts.append(decor("BaseTrim", (x, 0.06, z), (BASE_HALF_DEPTH * 2 + 2, 0.36, BASE_HALF_WIDTH * 2 + 2),
-                               (60, 190, 200), "Neon"))
+                               (60, 190, 200), "SmoothPlastic"))
             parts.append(part("Plot", (x, 0.3, z), (4, 0.2, 4), (255, 255, 255), tags=["BasePlot"],
                               attributes={"BaseIndex": index}, Transparency=1, CanCollide=False, CanQuery=False,
                               CanTouch=False))
@@ -252,9 +252,9 @@ def coral(x, z, glow):
         height = random.uniform(3, 9)
         cx, cz = x + random.uniform(-3, 3), z + random.uniform(-3, 3)
         color = random.choice(palette)
-        parts.append(part("Coral", on_floor(cx, cz, height / 2 - 0.5), (height, 1.4, 1.4), color, "Neon",
+        parts.append(part("Coral", on_floor(cx, cz, height / 2 - 0.5), (height, 1.4, 1.4), color, "SmoothPlastic",
                           orientation=UPRIGHT, Shape="Cylinder", CanCollide=False))
-        parts.append(ball("CoralTip", on_floor(cx, cz, height - 0.4), random.uniform(1, 1.8), color, "Neon",
+        parts.append(ball("CoralTip", on_floor(cx, cz, height - 0.4), random.uniform(1, 1.8), color, "SmoothPlastic",
                           CanCollide=False))
     return parts
 
@@ -338,7 +338,7 @@ def build_zone(index):
         parts.append(part("Cliff", (sx * (HALF_WIDTH + 8), (bottom - 1.8) / 2, (z0 + z1) / 2),
                           (16, -1.8 - bottom, ZONE_LENGTH), wall_color, "Rock"))
         # Glowing veins on the cliffs so the walls are never plain.
-        for _ in range(7):
+        for _ in range(12):
             z = random.uniform(z0 + 4, z1 - 4)
             parts.append(decor("Vein", (sx * (HALF_WIDTH - 0.2), floor_y(z) + random.uniform(4, 40), z),
                                (0.4, random.uniform(3, 10), random.uniform(0.6, 1.4)), glow, "Neon",
@@ -359,16 +359,16 @@ def build_zone(index):
 
     # Nests and the guardian's bed.
     nests = []
-    for k in range(6):
-        z = z0 + 22 + k * 13
-        x = (-1 if k % 2 == 0 else 1) * random.uniform(14, 27)
+    for k in range(8):
+        z = z0 + 60 + k * 38
+        x = (-1 if k % 2 == 0 else 1) * random.uniform(16, 50)
         nests.append((x, z))
         y = floor_y(z)
         parts.append(part("Nest", (x, y + 0.5, z), (1, 7, 7), (90, 70, 60), "Slate", orientation=UPRIGHT,
                           Shape="Cylinder", tags=["EggNest"], attributes={"Zone": index}))
         parts.append(decor("NestGlow", (x, y + 0.95, z), (0.3, 5.6, 5.6), glow, "Neon", orientation=UPRIGHT,
                            Shape="Cylinder", children=[light(glow, 1.4, 18)]))
-    guard_x, guard_z = (-1 if index % 2 else 1) * 3, z0 + 58
+    guard_x, guard_z = (-1 if index % 2 else 1) * 4, z0 + 200
     parts.append(part("GuardBed", on_floor(guard_x, guard_z, 0.3), (0.8, 24, 24), wall_color, "Slate",
                       orientation=UPRIGHT, Shape="Cylinder", tags=["GuardPost"], attributes={"Zone": index},
                       CanCollide=False))
@@ -380,7 +380,7 @@ def build_zone(index):
     def spots(count, margin, x_range=HALF_WIDTH - 5):
         found = []
         tries = 0
-        while len(found) < count and tries < 400:
+        while len(found) < count and tries < 3000:
             tries += 1
             x, z = random.uniform(-x_range, x_range), random.uniform(z0 + 8, z1 - 4)
             if free(x, z, margin) and all(math.hypot(x - fx, z - fz) > margin * 2 for fx, fz in found):
@@ -388,26 +388,26 @@ def build_zone(index):
         return found
 
     if index == 1:
-        for x, z in spots(16, 3):
+        for x, z in spots(55, 3):
             parts += coral(x, z, glow)
-        for x, z in spots(18, 1):
+        for x, z in spots(60, 1):
             parts += seaweed(x, z)
-        for x, z in spots(8, 2):
-            parts += rock(x, z, random.uniform(3, 6), (150, 150, 160))
+        for x, z in spots(30, 2):
+            parts += rock(x, z, random.uniform(4, 9), (150, 150, 160))
     elif index == 2:
-        for i, (x, z) in enumerate(spots(3, 14, HALF_WIDTH - 14)):
+        for i, (x, z) in enumerate(spots(8, 16, HALF_WIDTH - 14)):
             parts += shipwreck(x, z, i * 1.1)
-        for x, z in spots(10, 2):
+        for x, z in spots(35, 2):
             parts.append(part("Crate", on_floor(x, z, 1.5), (3, 3, 3), (120, 90, 64), "WoodPlanks",
                               orientation=mat_mul(yaw(random.uniform(0, 2)), pitch(0.2))))
-        for x, z in spots(14, 1):
+        for x, z in spots(45, 1):
             parts += seaweed(x, z, (50, 130, 110))
-        for x, z in spots(6, 3):
+        for x, z in spots(20, 3):
             parts += coral(x, z, glow)
     elif index == 3:
-        for x, z in spots(14, 4):
+        for x, z in spots(48, 4):
             parts += atlantis_column(x, z, random.choice([8, 14, 22, 28]), glow)
-        for x, z in spots(3, 9, HALF_WIDTH - 12):
+        for x, z in spots(10, 9, HALF_WIDTH - 12):
             base = on_floor(x, z)
             for sx in (-1, 1):
                 parts.append(part("ArchLeg", (base[0] + sx * 7, base[1] + 8, base[2]), (3, 16, 3), (210, 220, 236),
@@ -415,19 +415,19 @@ def build_zone(index):
             parts.append(part("ArchTop", (base[0], base[1] + 17.5, base[2]), (20, 3, 4), (210, 220, 236), "Marble"))
             parts.append(decor("ArchRune", (base[0], base[1] + 17.5, base[2] - 2.1), (12, 1.2, 0.3), glow, "Neon",
                                children=[light(glow, 2, 28)]))
-        for x, z in spots(10, 2):
-            parts += rock(x, z, random.uniform(3, 6), (150, 164, 190))
+        for x, z in spots(30, 2):
+            parts += rock(x, z, random.uniform(4, 9), (150, 164, 190))
     elif index == 4:
-        for x, z in spots(26, 2):
+        for x, z in spots(70, 2):
             parts += jellyfish(x, z, random.uniform(9, 34), glow)
-        for x, z in spots(12, 3):
-            parts += rock(x, z, random.uniform(4, 8), (60, 50, 104))
-        for x, z in spots(10, 3):
+        for x, z in spots(40, 3):
+            parts += rock(x, z, random.uniform(5, 10), (60, 50, 104))
+        for x, z in spots(25, 3):
             parts += coral(x, z, glow)
     else:
-        for x, z in spots(22, 4):
+        for x, z in spots(70, 4):
             parts += abyss_spike(x, z, glow)
-        for x, z in spots(10, 2):
+        for x, z in spots(30, 2):
             parts += jellyfish(x, z, random.uniform(12, 30), glow)
     return folder("Zone%d" % index, parts)
 

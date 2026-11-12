@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local Sea = require(ReplicatedStorage.Shared.Sea)
@@ -30,7 +31,6 @@ local SURFACE = {
 	brightness = 2.6,
 	density = 0.26,
 	haze = 0.6,
-	bloom = 0.35,
 	tint = Color3.new(1, 1, 1),
 }
 
@@ -54,7 +54,6 @@ local function depthLook(depth: number)
 			brightness = 2 - k * 1.7,
 			density = 0.42 + k * 0.22,
 			haze = 1.4 + k * 1.2,
-			bloom = 0.5 + k * 0.6,
 			tint = zone.water:Lerp(Color3.new(1, 1, 1), 0.72 - k * 0.2),
 		}
 	end
@@ -65,15 +64,69 @@ local function depthLook(depth: number)
 		brightness = a.brightness + (b.brightness - a.brightness) * alpha,
 		density = a.density + (b.density - a.density) * alpha,
 		haze = a.haze + (b.haze - a.haze) * alpha,
-		bloom = a.bloom + (b.bloom - a.bloom) * alpha,
 		tint = a.tint:Lerp(b.tint, alpha),
 	}
 end
 
+local function ensure(className: string): any
+	local found = Lighting:FindFirstChildOfClass(className)
+	if not found then
+		found = Instance.new(className)
+		found.Parent = Lighting
+	end
+	return found
+end
+
+-- Soft sun, no blinding glare, gentle bloom (values in Config.Look).
+local function applyLook()
+	Lighting.ExposureCompensation = Config.Look.Exposure
+	local bloom = ensure("BloomEffect")
+	bloom.Intensity = Config.Look.BloomIntensity
+	bloom.Threshold = Config.Look.BloomThreshold
+	bloom.Size = Config.Look.BloomSize
+	local atmosphere = ensure("Atmosphere")
+	atmosphere.Glare = 0
+	local rays = Lighting:FindFirstChildOfClass("SunRaysEffect")
+	if rays then
+		rays.Intensity = 0.03
+	end
+	local sky = Lighting:FindFirstChildOfClass("Sky")
+	if sky then
+		sky.SunAngularSize = 8
+	end
+end
+
+-- Bubbles drifting up around the camera while you are under water.
+local function makeBubbles(): ParticleEmitter
+	local holder = Instance.new("Part")
+	holder.Name = "BubbleHolder"
+	holder.Anchored = true
+	holder.CanCollide = false
+	holder.CanQuery = false
+	holder.CanTouch = false
+	holder.Transparency = 1
+	holder.Size = Vector3.new(60, 1, 60)
+	holder.Parent = workspace.CurrentCamera
+	local bubbles = Instance.new("ParticleEmitter")
+	bubbles.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	bubbles.Color = ColorSequence.new(Color3.fromRGB(220, 245, 255))
+	bubbles.LightEmission = 0.3
+	bubbles.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 0.45) })
+	bubbles.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(1, 1) })
+	bubbles.Lifetime = NumberRange.new(3, 5)
+	bubbles.Speed = NumberRange.new(3, 6)
+	bubbles.EmissionDirection = Enum.NormalId.Top
+	bubbles.SpreadAngle = Vector2.new(15, 15)
+	bubbles.Rate = 0
+	bubbles.Parent = holder
+	return bubbles
+end
+
 local function startDepth()
-	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
-	local bloom = Lighting:FindFirstChildOfClass("BloomEffect") or Instance.new("BloomEffect", Lighting)
-	local tint = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
+	applyLook()
+	local atmosphere = ensure("Atmosphere")
+	local tint = ensure("ColorCorrectionEffect")
+	local bubbles = makeBubbles()
 	local current = 0
 	RunService.RenderStepped:Connect(function(dt)
 		local camera = workspace.CurrentCamera
@@ -94,8 +147,10 @@ local function startDepth()
 		Lighting.Ambient = look.ambient
 		Lighting.OutdoorAmbient = look.ambient
 		Lighting.Brightness = look.brightness
-		bloom.Intensity = look.bloom
 		tint.TintColor = look.tint
+		local holder = bubbles.Parent :: BasePart
+		holder.CFrame = CFrame.new(camera.CFrame.Position - Vector3.new(0, 18, 0))
+		bubbles.Rate = if current > 0.3 then 12 + current * 6 else 0
 	end)
 end
 
@@ -154,47 +209,155 @@ end
 -- Living things: sleeping guardians breathe, aquarium creatures swim
 ---------------------------------------------------------------------------
 
-local function animateTagged(tag: string, motion: (number, number) -> CFrame)
-	local homes: { [Model]: { home: CFrame, seed: number } } = {}
-	local function add(model: Instance)
-		if model:IsA("Model") and model.PrimaryPart then
-			homes[model] = { home = model:GetPivot(), seed = math.random() * 100 }
+local function onTagged(tag: string, added: (Model) -> (() -> ())?)
+	local cleanups: { [Instance]: () -> () } = {}
+	local function add(instance: Instance)
+		if instance:IsA("Model") and instance.PrimaryPart and not cleanups[instance] then
+			cleanups[instance] = added(instance) or function() end
 		end
 	end
-	CollectionService:GetInstanceAddedSignal(tag):Connect(function(model)
-		task.defer(add, model) -- wait until the server finished placing it
+	CollectionService:GetInstanceAddedSignal(tag):Connect(function(instance)
+		task.defer(add, instance) -- wait until the server finished placing it
 	end)
-	CollectionService:GetInstanceRemovedSignal(tag):Connect(function(model)
-		homes[model :: Model] = nil
+	CollectionService:GetInstanceRemovedSignal(tag):Connect(function(instance)
+		local cleanup = cleanups[instance]
+		cleanups[instance] = nil
+		if cleanup then
+			cleanup()
+		end
 	end)
-	for _, model in CollectionService:GetTagged(tag) do
-		add(model)
+	for _, instance in CollectionService:GetTagged(tag) do
+		add(instance)
 	end
-	RunService.RenderStepped:Connect(function()
-		local camera = workspace.CurrentCamera
-		local now = os.clock()
-		for model, info in homes do
-			if not model.Parent then
-				homes[model] = nil
-			elseif camera and (info.home.Position - camera.CFrame.Position).Magnitude < 220 then
-				model:PivotTo(info.home * motion(now + info.seed, info.seed))
+end
+
+-- A sleeping guardian breathes (slowly grows and shrinks) and its "Z z z" floats.
+local function breathe(model: Model)
+	local scale = model:GetScale()
+	local value = Instance.new("NumberValue")
+	value.Value = 1
+	local connection = value.Changed:Connect(function(v)
+		if model.Parent then
+			model:ScaleTo(scale * v)
+		end
+	end)
+	local tween = TweenService:Create(value, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), { Value = 1.05 })
+	tween:Play()
+	local gui = model.PrimaryPart and model.PrimaryPart:FindFirstChild("Mood")
+	local floatTween
+	if gui and gui:IsA("BillboardGui") then
+		local base = gui.StudsOffset
+		local offset = Instance.new("Vector3Value")
+		offset.Value = base
+		offset.Changed:Connect(function(v)
+			gui.StudsOffset = v
+		end)
+		floatTween = TweenService:Create(offset, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), { Value = base + Vector3.new(0, 1.5, 0) })
+		floatTween:Play()
+		floatTween.Destroying:Connect(function()
+			gui.StudsOffset = base
+		end)
+	end
+	return function()
+		tween:Cancel()
+		connection:Disconnect()
+		value:Destroy()
+		if floatTween then
+			floatTween:Cancel()
+			floatTween:Destroy()
+		end
+		if model.Parent then
+			model:ScaleTo(scale)
+		end
+	end
+end
+
+-- An awake guardian glows red.
+local function watchGuard(model: Model)
+	local function update()
+		local awake = model:GetAttribute("State") == "wake" or model:GetAttribute("State") == "chase"
+		local glow = model:FindFirstChild("AngryGlow")
+		if awake and not glow then
+			local highlight = Instance.new("Highlight")
+			highlight.Name = "AngryGlow"
+			highlight.FillColor = Color3.fromRGB(255, 40, 50)
+			highlight.FillTransparency = 0.75
+			highlight.OutlineColor = Color3.fromRGB(255, 60, 60)
+			highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+			highlight.Parent = model
+		elseif not awake and glow then
+			glow:Destroy()
+		end
+	end
+	local connection = model:GetAttributeChangedSignal("State"):Connect(update)
+	update()
+	return function()
+		connection:Disconnect()
+	end
+end
+
+-- Aquarium creatures swim from point to point around their spot.
+local function swim(model: Model)
+	local home = model:GetPivot()
+	local value = Instance.new("CFrameValue")
+	value.Value = home
+	local connection = value.Changed:Connect(function(v)
+		if model.Parent then
+			model:PivotTo(v)
+		end
+	end)
+	local alive = true
+	task.spawn(function()
+		local random = Random.new()
+		local position = home.Position
+		while alive and model.Parent do
+			local goal = home.Position + Vector3.new(random:NextNumber(-3, 3), random:NextNumber(-1.2, 1.2), random:NextNumber(-1.5, 1.5))
+			local direction = Vector3.new(goal.X - position.X, 0, goal.Z - position.Z)
+			local target = if direction.Magnitude > 0.2 then CFrame.lookAt(goal, goal + direction) else CFrame.new(goal) * home.Rotation
+			local time = (goal - position).Magnitude / random:NextNumber(1.2, 2.2) + 0.4
+			local tween = TweenService:Create(value, TweenInfo.new(time, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), { Value = target })
+			tween:Play()
+			tween.Completed:Wait()
+			position = goal
+			task.wait(random:NextNumber(0.2, 1.2))
+		end
+	end)
+	return function()
+		alive = false
+		connection:Disconnect()
+		value:Destroy()
+	end
+end
+
+-- Treadmill belts scroll while someone trains on them.
+local function startBelts()
+	local belts: { [BasePart]: Texture } = {}
+	local function add(belt: Instance)
+		local texture = belt:FindFirstChildOfClass("Texture")
+		if belt:IsA("BasePart") and texture then
+			belts[belt] = texture
+		end
+	end
+	CollectionService:GetInstanceAddedSignal(Config.Tags.Treadmill):Connect(add)
+	for _, belt in CollectionService:GetTagged(Config.Tags.Treadmill) do
+		add(belt)
+	end
+	RunService.RenderStepped:Connect(function(dt)
+		for belt, texture in belts do
+			if not belt.Parent then
+				belts[belt] = nil
+			elseif belt:GetAttribute("Active") then
+				texture.OffsetStudsV = (texture.OffsetStudsV - dt * 9) % texture.StudsPerTileV
 			end
 		end
 	end)
 end
 
 local function startLife()
-	-- Slow deep breathing.
-	animateTagged(Config.Tags.Sleeper, function(t)
-		return CFrame.new(0, math.sin(t * 1.1) * 0.5, 0) * CFrame.Angles(math.sin(t * 1.1) * 0.04, 0, math.sin(t * 0.55) * 0.03)
-	end)
-	-- Lazy laps inside the tank.
-	animateTagged(Config.Tags.Creature, function(t, seed)
-		local speed = 0.5 + (seed % 7) * 0.05
-		local x, z = math.sin(t * speed) * 2.2, math.sin(t * speed * 2) * 0.9
-		local heading = math.atan2(-math.cos(t * speed) * 2.2, -math.cos(t * speed * 2) * 1.8)
-		return CFrame.new(x, math.sin(t * 1.3) * 0.5, z) * CFrame.Angles(0, heading, math.sin(t * 6) * 0.08)
-	end)
+	onTagged(Config.Tags.Sleeper, breathe)
+	onTagged(Config.Tags.Guard, watchGuard)
+	onTagged(Config.Tags.Creature, swim)
+	startBelts()
 end
 
 local function startNestTimers()
@@ -263,6 +426,12 @@ local function startTreadmill()
 		end
 		character:GetAttributeChangedSignal("Training"):Connect(update)
 		update()
+		-- Jumping is the only way off the treadmill.
+		humanoid.Jumping:Connect(function(active)
+			if active and character:GetAttribute("Training") then
+				Effects.leaveTreadmill()
+			end
+		end)
 	end
 	player.CharacterAdded:Connect(watch)
 	if player.Character then
@@ -376,6 +545,14 @@ function Effects.notifySound(message: string, kind: string?)
 		Effects.sound("error")
 	elseif kind == "success" then
 		Effects.sound("success")
+	end
+end
+
+local lastLeave = 0
+function Effects.leaveTreadmill()
+	if os.clock() - lastLeave > 0.4 then
+		lastLeave = os.clock()
+		ReplicatedStorage.Remotes.LeaveTreadmill:FireServer()
 	end
 end
 

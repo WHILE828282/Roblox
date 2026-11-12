@@ -6,6 +6,7 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local Hud = require(script.Parent.UI.Hud)
@@ -70,6 +71,14 @@ ContextActionService:BindAction("SeaDash", function(_, inputState)
 	end
 	return Enum.ContextActionResult.Pass
 end, false, Enum.KeyCode.Q, Enum.KeyCode.ButtonX)
+
+-- Jump = get off the treadmill (works on PC, phone and gamepad).
+UserInputService.JumpRequest:Connect(function()
+	local character = player.Character
+	if character and character:GetAttribute("Training") then
+		Effects.leaveTreadmill()
+	end
+end)
 
 Effects.start()
 

@@ -15,7 +15,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local Sea = require(ReplicatedStorage.Shared.Sea)
 local Format = require(ReplicatedStorage.Shared.Format)
-local CreatureModel = require(ReplicatedStorage.Shared.CreatureModel)
+local AssetModels = require(ReplicatedStorage.Shared.AssetModels)
 local PlayerData = require(script.Parent.PlayerData)
 local Movement = require(script.Parent.Parent.Lib.Movement)
 local RateLimiter = require(script.Parent.Parent.Lib.RateLimiter)
@@ -29,6 +29,11 @@ local bases = {}
 local playerBase: { [Player]: any } = {}
 local knockbackRemote = Remotes.get("Knockback")
 local actionLimiter = RateLimiter.new(Config.ActionCooldown)
+
+-- Treadmill: held[player] = { attachment, base } while the player trains.
+local held: { [Player]: any } = {}
+local mustStepOff: { [Player]: boolean } = {}
+local BELT_TEXTURE = "rbxassetid://123261210080262"
 
 local root = Instance.new("Folder")
 root.Name = "Bases"
@@ -100,6 +105,12 @@ end
 function Bases.isHome(player: Player, position: Vector3): boolean
 	local base = playerBase[player]
 	return base ~= nil and inBase(base, position)
+end
+
+-- Where the player appears at home (also used when a guardian catches them).
+function Bases.spawnCFrame(player: Player): CFrame?
+	local base = playerBase[player]
+	return base and base.frame * CFrame.new(0, 4, -Config.BaseHalfDepth + 6) * CFrame.Angles(0, math.rad(180), 0)
 end
 
 -- World position of the entrance of the player's base (for the guide beam).
@@ -202,12 +213,13 @@ local function refreshDisplay(player: Player)
 	for _, egg in data.Eggs do
 		seen[egg.id] = true
 		if not base.eggModels[egg.id] then
-			local model = CreatureModel.buildEgg(egg.c)
+			local model = AssetModels.egg(egg.c)
 			model.Name = "NestEgg"
-			model:PivotTo(base.incubators[egg.slot] * CFrame.new(0, 3.2, 0))
+			model:PivotTo(base.incubators[egg.slot] * CFrame.new(0, 1.9, 0))
 			model:SetAttribute("HatchAt", egg.hatchAt)
 			model:SetAttribute("OwnerId", player.UserId)
-			local label = billboard(model.PrimaryPart, UDim2.fromOffset(150, 44), 3.2, Sea.rarityOf(egg.c).color, 70)
+			local eggHeight = model:GetExtentsSize().Y
+			local label = billboard(model.PrimaryPart, UDim2.fromOffset(150, 44), eggHeight + 1.5, Sea.rarityOf(egg.c).color, 70)
 			label.Parent.Name = "Timer"
 			local prompt = make("ProximityPrompt", {
 				ActionText = "Steal",
@@ -243,8 +255,9 @@ local function refreshDisplay(player: Player)
 			local random = Random.new(entry.id * 7919)
 			local half = AQUARIUM.size / 2 - Vector3.new(2.5, 2, 2.5)
 			local spot = AQUARIUM.center + Vector3.new(random:NextNumber(-half.X, half.X), random:NextNumber(-half.Y, half.Y), random:NextNumber(-half.Z, half.Z))
-			local model = CreatureModel.build(entry.c, 0.75)
-			model:PivotTo(base.frame * CFrame.new(spot) * CFrame.Angles(0, math.rad(90), 0))
+			local model = AssetModels.creature(entry.c)
+			local bottom = spot - Vector3.new(0, AssetModels.CreatureHeight / 2, 0)
+			model:PivotTo(base.frame * CFrame.new(bottom) * CFrame.Angles(0, math.rad(90), 0))
 			CollectionService:AddTag(model, Config.Tags.Creature)
 			model.Parent = base.folder
 			base.creatureModels[entry.id] = model
@@ -444,25 +457,31 @@ local function setupBase(marker: BasePart)
 		local spot = frame * CFrame.new(-16 + (slot - 1) * 6.2, 0, 0)
 		table.insert(incubators, spot)
 		block(static, "Incubator", Vector3.new(1.6, 4, 4), spot * CFrame.new(0, 0.8, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(90, 100, 140), Enum.Material.Metal, { Shape = Enum.PartType.Cylinder })
-		local ring = block(static, "IncubatorGlow", Vector3.new(0.3, 4.4, 4.4), spot * CFrame.new(0, 1.7, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(120, 255, 220), Enum.Material.Neon, { Shape = Enum.PartType.Cylinder, CanCollide = false })
+		local ring = block(static, "IncubatorRing", Vector3.new(0.3, 4.4, 4.4), spot * CFrame.new(0, 1.7, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(90, 220, 200), Enum.Material.SmoothPlastic, { Shape = Enum.PartType.Cylinder, CanCollide = false })
 		make("PointLight", { Color = ring.Color, Range = 10, Brightness = 0.8 }, ring)
 	end
 
 	-- Treadmill with its upgrade button.
 	local belt = block(static, "Treadmill", Vector3.new(TREADMILL.half.X * 2, 0.8, TREADMILL.half.Z * 2), frame * CFrame.new(TREADMILL.center + Vector3.new(0, 0.4, 0)), Color3.fromRGB(40, 44, 60), Enum.Material.Rubber)
-	for i = -2, 2 do
-		block(static, "BeltStripe", Vector3.new(TREADMILL.half.X * 2 - 1, 0.1, 0.5), belt.CFrame * CFrame.new(0, 0.42, i * 2.3), Color3.fromRGB(255, 220, 70), Enum.Material.Neon, { CanCollide = false })
-	end
+	-- The belt surface: the client scrolls this texture while someone trains.
+	make("Texture", {
+		Name = "BeltTexture",
+		Texture = BELT_TEXTURE,
+		Face = Enum.NormalId.Top,
+		StudsPerTileU = TREADMILL.half.X * 2,
+		StudsPerTileV = 3,
+	}, belt)
+	CollectionService:AddTag(belt, Config.Tags.Treadmill)
 	for _, side in { -1, 1 } do
 		block(static, "TreadmillRail", Vector3.new(0.5, 3.6, 0.5), belt.CFrame * CFrame.new(side * TREADMILL.half.X, 2, TREADMILL.half.Z - 0.5), Color3.fromRGB(230, 60, 80), Enum.Material.Metal)
 	end
 	local console = block(static, "TreadmillConsole", Vector3.new(TREADMILL.half.X * 2 + 0.5, 1.4, 0.6), belt.CFrame * CFrame.new(0, 3.6, TREADMILL.half.Z - 0.5), Color3.fromRGB(230, 60, 80), Enum.Material.Metal)
 	billboard(console, UDim2.fromOffset(170, 40), 1.6, Color3.fromRGB(255, 230, 90), 60).Text = "TREADMILL\nStand here to train Speed"
-	local button = block(static, "UpgradeButton", Vector3.new(1, 3, 3), frame * CFrame.new(TREADMILL.center.X, 1.2, TREADMILL.center.Z - TREADMILL.half.Z - 3) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(90, 220, 100), Enum.Material.Neon, { Shape = Enum.PartType.Cylinder })
+	local button = block(static, "UpgradeButton", Vector3.new(1, 3, 3), frame * CFrame.new(TREADMILL.center.X, 1.2, TREADMILL.center.Z - TREADMILL.half.Z - 3) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(90, 220, 100), Enum.Material.SmoothPlastic, { Shape = Enum.PartType.Cylinder })
 	local treadmillPrompt = make("ProximityPrompt", { ActionText = "Upgrade Treadmill", ObjectText = "", HoldDuration = 0.3, MaxActivationDistance = 9, RequiresLineOfSight = false }, button)
 
 	-- Collect plate.
-	local plate = block(static, "CollectPlate", Vector3.new(PLATE.half.X * 2, 0.4, PLATE.half.Z * 2), frame * CFrame.new(PLATE.center + Vector3.new(0, 0.2, 0)), Color3.fromRGB(70, 230, 110), Enum.Material.Neon)
+	local plate = block(static, "CollectPlate", Vector3.new(PLATE.half.X * 2, 0.4, PLATE.half.Z * 2), frame * CFrame.new(PLATE.center + Vector3.new(0, 0.2, 0)), Color3.fromRGB(70, 210, 110), Enum.Material.SmoothPlastic)
 	local plateLabel = billboard(plate, UDim2.fromOffset(170, 56), 3.2, Color3.fromRGB(150, 255, 170), 80)
 
 	-- Water shield at the entrance (visible only while the base is locked).
@@ -494,6 +513,7 @@ local function setupBase(marker: BasePart)
 		treadmillPrompt = treadmillPrompt,
 		shield = shield,
 		shieldFx = shieldFx,
+		belt = belt,
 		index = index,
 	}
 	treadmillPrompt.Triggered:Connect(function(player)
@@ -517,7 +537,9 @@ local function spawnAtBase(player: Player, character: Model)
 		return
 	end
 	task.wait()
-	character:PivotTo(base.frame * CFrame.new(0, 4, -Config.BaseHalfDepth + 4) * CFrame.Angles(0, math.rad(180), 0))
+	held[player] = nil -- the old character took its constraints with it
+	mustStepOff[player] = nil
+	character:PivotTo(Bases.spawnCFrame(player) :: CFrame)
 	Movement.apply(player)
 end
 
@@ -577,23 +599,94 @@ local function economyTick()
 	end
 end
 
--- Twice a second: standing on your treadmill trains Speed.
-local function treadmillTick(dt: number)
-	for player, data in PlayerData.all() do
+-- Treadmill: stepping on the belt locks you to its center (AlignPosition +
+-- AlignOrientation) and you run on the spot. Jumping lets you go.
+
+local function setBeltActive(base)
+	local active = false
+	for _, hold in held do
+		if hold.base == base then
+			active = true
+		end
+	end
+	base.belt:SetAttribute("Active", active)
+end
+
+local function releaseTreadmill(player: Player)
+	local hold = held[player]
+	held[player] = nil
+	if not hold then
+		return
+	end
+	if hold.attachment.Parent then
+		hold.attachment:Destroy() -- removes both constraints with it
+	end
+	mustStepOff[player] = true -- you have to walk off before it grabs you again
+	local character = player.Character
+	if character then
+		character:SetAttribute("Training", false)
+	end
+	setBeltActive(hold.base)
+end
+
+local function holdOnTreadmill(player: Player, base, character: Model, rootPart: BasePart, humanoid: Humanoid)
+	local height = 0.8 + humanoid.HipHeight + rootPart.Size.Y / 2
+	local position = (base.frame * CFrame.new(TREADMILL.center + Vector3.new(0, height, 0))).Position
+	local attachment = Instance.new("Attachment")
+	attachment.Name = "TreadmillHold"
+	local align = Instance.new("AlignPosition")
+	align.Mode = Enum.PositionAlignmentMode.OneAttachment
+	align.Attachment0 = attachment
+	align.Position = position
+	align.MaxForce = 1e6
+	align.Responsiveness = 60
+	align.Parent = attachment
+	local turn = Instance.new("AlignOrientation")
+	turn.Mode = Enum.OrientationAlignmentMode.OneAttachment
+	turn.Attachment0 = attachment
+	-- Face along the belt, towards the console.
+	turn.CFrame = CFrame.lookAt(position, position - base.frame.LookVector)
+	turn.MaxTorque = 1e6
+	turn.Responsiveness = 60
+	turn.Parent = attachment
+	attachment.Parent = rootPart
+	held[player] = { attachment = attachment, base = base }
+	character:SetAttribute("Training", true)
+	setBeltActive(base)
+end
+
+-- 5 times a second: who stands on their treadmill?
+local function treadmillTick()
+	for player in PlayerData.all() do
 		local base = playerBase[player]
 		local character = player.Character
-		local characterRoot = character and character:FindFirstChild("HumanoidRootPart")
-		if base and characterRoot then
-			local at = base.frame:PointToObjectSpace(characterRoot.Position) - TREADMILL.center
-			local training = math.abs(at.X) <= TREADMILL.half.X and math.abs(at.Z) <= TREADMILL.half.Z and at.Y < 8
-			if training and data.Speed < Config.MaxSpeed then
-				local gain = Config.treadmillRate(data.Treadmill) * Sea.trailMultiplier(data.Trail) * dt
-				data.Speed = math.min(Config.MaxSpeed, data.Speed + gain)
-				Movement.apply(player)
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+		local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+		local hold = held[player]
+		if hold and (not rootPart or hold.attachment.Parent ~= rootPart or not humanoid or humanoid.Health <= 0) then
+			releaseTreadmill(player)
+			hold = nil
+		end
+		if base and rootPart and humanoid and humanoid.Health > 0 and not hold then
+			local at = base.frame:PointToObjectSpace(rootPart.Position) - TREADMILL.center
+			local onBelt = math.abs(at.X) <= TREADMILL.half.X and math.abs(at.Z) <= TREADMILL.half.Z and at.Y < 8
+			if not onBelt then
+				mustStepOff[player] = nil
+			elseif not mustStepOff[player] then
+				holdOnTreadmill(player, base, character :: Model, rootPart, humanoid)
 			end
-			if character:GetAttribute("Training") ~= training then
-				character:SetAttribute("Training", training)
-			end
+		end
+	end
+end
+
+-- Every second: everyone on a treadmill gets faster.
+local function trainTick()
+	for player in held do
+		local data = PlayerData.get(player)
+		if data and data.Speed < Config.MaxSpeed then
+			local gain = Config.treadmillRate(data.Treadmill) * Sea.trailMultiplier(data.Trail)
+			data.Speed = math.min(Config.MaxSpeed, data.Speed + gain)
+			Movement.apply(player)
 		end
 	end
 end
@@ -627,7 +720,14 @@ function Bases.start()
 	for _, player in Players:GetPlayers() do
 		watchPlayer(player)
 	end
-	Players.PlayerRemoving:Connect(releaseBase)
+	Players.PlayerRemoving:Connect(function(player)
+		releaseTreadmill(player)
+		mustStepOff[player] = nil
+		releaseBase(player)
+	end)
+	Remotes.get("LeaveTreadmill").OnServerEvent:Connect(function(player)
+		releaseTreadmill(player)
+	end)
 
 	Remotes.get("SellCreature").OnServerEvent:Connect(onSell)
 	Remotes.get("LockBase").OnServerEvent:Connect(onLock)
@@ -642,7 +742,14 @@ function Bases.start()
 	end)
 	task.spawn(function()
 		while true do
-			treadmillTick(task.wait(0.5))
+			task.wait(0.2)
+			treadmillTick()
+		end
+	end)
+	task.spawn(function()
+		while true do
+			task.wait(1)
+			trainTick()
 		end
 	end)
 	task.spawn(function()

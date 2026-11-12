@@ -15,7 +15,7 @@ local Remotes = {}
 --   OpenPanel(name)          open a window (the trail stand on the pier)
 -- Client -> server (always validated on the server!)
 --   RequestSync, Dash, DropEgg, LockBase, BuyTrail(id), EquipTrail(id),
---   UpgradeTreadmill, UpgradeAquarium, SellCreature(id)
+--   UpgradeTreadmill, UpgradeAquarium, SellCreature(id), LeaveTreadmill (sent when you jump)
 Remotes.Names = {
 	StateChanged = true,
 	Notify = true,
@@ -31,6 +31,7 @@ Remotes.Names = {
 	UpgradeTreadmill = true,
 	UpgradeAquarium = true,
 	SellCreature = true,
+	LeaveTreadmill = true,
 }
 
 function Remotes.get(name: string): RemoteEvent
